@@ -70,6 +70,11 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
+    discography: Discography;
+    mixes: Mix;
+    events: Event;
+    curatorship: Curatorship;
+    'sound-design': SoundDesign;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -86,6 +91,11 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    discography: DiscographySelect<false> | DiscographySelect<true>;
+    mixes: MixesSelect<false> | MixesSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
+    curatorship: CuratorshipSelect<false> | CuratorshipSelect<true>;
+    'sound-design': SoundDesignSelect<false> | SoundDesignSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -683,6 +693,68 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "discography".
+ */
+export interface Discography {
+  id: number;
+  title: string;
+  year: number;
+  label: string;
+  type: string;
+  duration?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mixes".
+ */
+export interface Mix {
+  id: number;
+  title: string;
+  year: number;
+  platformVenue: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: number;
+  event: string;
+  year: number;
+  location: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "curatorship".
+ */
+export interface Curatorship {
+  id: number;
+  entity: string;
+  role: string;
+  date: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sound-design".
+ */
+export interface SoundDesign {
+  id: number;
+  title: string;
+  year: number;
+  platform: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -872,6 +944,26 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'discography';
+        value: number | Discography;
+      } | null)
+    | ({
+        relationTo: 'mixes';
+        value: number | Mix;
+      } | null)
+    | ({
+        relationTo: 'events';
+        value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'curatorship';
+        value: number | Curatorship;
+      } | null)
+    | ({
+        relationTo: 'sound-design';
+        value: number | SoundDesign;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1207,6 +1299,63 @@ export interface UsersSelect<T extends boolean = true> {
   hash?: T;
   loginAttempts?: T;
   lockUntil?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "discography_select".
+ */
+export interface DiscographySelect<T extends boolean = true> {
+  title?: T;
+  year?: T;
+  label?: T;
+  type?: T;
+  duration?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mixes_select".
+ */
+export interface MixesSelect<T extends boolean = true> {
+  title?: T;
+  year?: T;
+  platformVenue?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events_select".
+ */
+export interface EventsSelect<T extends boolean = true> {
+  event?: T;
+  year?: T;
+  location?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "curatorship_select".
+ */
+export interface CuratorshipSelect<T extends boolean = true> {
+  entity?: T;
+  role?: T;
+  date?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sound-design_select".
+ */
+export interface SoundDesignSelect<T extends boolean = true> {
+  title?: T;
+  year?: T;
+  platform?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

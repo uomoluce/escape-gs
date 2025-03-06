@@ -16,6 +16,11 @@ import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
+import { Discography } from './collections/Discography'
+import { Mixes } from './collections/Mixes'
+import { Events } from './collections/Events'
+import { Curatorship } from './collections/Curatorship'
+import { SoundDesign } from './collections/SoundDesign'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -64,7 +69,18 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URI || '',
     },
   }),
-  collections: [Pages, Posts, Media, Categories, Users],
+  collections: [
+    Pages,
+    Posts,
+    Media,
+    Categories,
+    Users,
+    Discography,
+    Mixes,
+    Events,
+    Curatorship,
+    SoundDesign,
+  ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   plugins: [
