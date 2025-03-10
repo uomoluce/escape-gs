@@ -697,10 +697,19 @@ export interface Form {
  */
 export interface Discography {
   id: number;
-  title: string;
   year: number;
+  title: string;
+  /**
+   * e.g. Union Editions
+   */
   label: string;
+  /**
+   * e.g. 7", EP
+   */
   type: string;
+  /**
+   * e.g. 2:30
+   */
   duration?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -711,9 +720,9 @@ export interface Discography {
  */
 export interface Mix {
   id: number;
-  title: string;
   year: number;
-  platformVenue: string;
+  title: string;
+  platform: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -723,8 +732,8 @@ export interface Mix {
  */
 export interface Event {
   id: number;
-  event: string;
   year: number;
+  title: string;
   location: string;
   updatedAt: string;
   createdAt: string;
@@ -735,8 +744,17 @@ export interface Event {
  */
 export interface Curatorship {
   id: number;
+  /**
+   * Il Pianeta Redenta
+   */
   entity: string;
+  /**
+   * Production
+   */
   role: string;
+  /**
+   * 2024 - 2025
+   */
   date: string;
   updatedAt: string;
   createdAt: string;
@@ -747,8 +765,8 @@ export interface Curatorship {
  */
 export interface SoundDesign {
   id: number;
-  title: string;
   year: number;
+  title: string;
   platform: string;
   updatedAt: string;
   createdAt: string;
@@ -1305,8 +1323,8 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "discography_select".
  */
 export interface DiscographySelect<T extends boolean = true> {
-  title?: T;
   year?: T;
+  title?: T;
   label?: T;
   type?: T;
   duration?: T;
@@ -1318,9 +1336,9 @@ export interface DiscographySelect<T extends boolean = true> {
  * via the `definition` "mixes_select".
  */
 export interface MixesSelect<T extends boolean = true> {
-  title?: T;
   year?: T;
-  platformVenue?: T;
+  title?: T;
+  platform?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1329,8 +1347,8 @@ export interface MixesSelect<T extends boolean = true> {
  * via the `definition` "events_select".
  */
 export interface EventsSelect<T extends boolean = true> {
-  event?: T;
   year?: T;
+  title?: T;
   location?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1351,8 +1369,8 @@ export interface CuratorshipSelect<T extends boolean = true> {
  * via the `definition` "sound-design_select".
  */
 export interface SoundDesignSelect<T extends boolean = true> {
-  title?: T;
   year?: T;
+  title?: T;
   platform?: T;
   updatedAt?: T;
   createdAt?: T;

@@ -2,6 +2,10 @@ import { CollectionConfig } from 'payload'
 
 export const Curatorship: CollectionConfig = {
   slug: 'curatorship',
+  labels: {
+    singular: 'Curatorship',
+    plural: 'Curatorship',
+  },
   admin: {
     useAsTitle: 'entity',
   },
@@ -13,20 +17,25 @@ export const Curatorship: CollectionConfig = {
       name: 'entity',
       type: 'text',
       required: true,
+      admin: {
+        description: 'Il Pianeta Redenta',
+      },
     },
     {
       name: 'role',
       type: 'text',
       required: true,
+      admin: {
+        description: 'Production',
+      },
     },
     {
       name: 'date',
-      type: 'date',
+      label: 'Date/Date Range',
+      type: 'text',
       required: true,
       admin: {
-        date: {
-          pickerAppearance: 'dayAndTime',
-        },
+        description: '2024 - 2025',
       },
     },
   ],

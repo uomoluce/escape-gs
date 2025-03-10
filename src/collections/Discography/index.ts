@@ -2,6 +2,10 @@ import { CollectionConfig } from 'payload'
 
 export const Discography: CollectionConfig = {
   slug: 'discography',
+  labels: {
+    singular: 'Discography',
+    plural: 'Discography',
+  },
   admin: {
     useAsTitle: 'title',
   },
@@ -10,11 +14,6 @@ export const Discography: CollectionConfig = {
   },
   fields: [
     {
-      name: 'title',
-      type: 'text',
-      required: true,
-    },
-    {
       name: 'year',
       type: 'number',
       required: true,
@@ -22,14 +21,25 @@ export const Discography: CollectionConfig = {
       max: new Date().getFullYear(),
     },
     {
+      name: 'title',
+      type: 'text',
+      required: true,
+    },
+    {
       name: 'label',
       type: 'text',
       required: true,
+      admin: {
+        description: 'e.g. Union Editions',
+      },
     },
     {
       name: 'type',
       type: 'text',
       required: true,
+      admin: {
+        description: 'e.g. 7", EP',
+      },
     },
     {
       name: 'duration',
@@ -42,6 +52,9 @@ export const Discography: CollectionConfig = {
           return 'Please enter duration in format MM:SS or HH:MM:SS'
         }
         return true
+      },
+      admin: {
+        description: 'e.g. 2:30',
       },
     },
   ],

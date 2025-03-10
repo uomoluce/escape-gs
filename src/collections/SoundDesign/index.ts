@@ -2,6 +2,10 @@ import { CollectionConfig } from 'payload'
 
 export const SoundDesign: CollectionConfig = {
   slug: 'sound-design',
+  labels: {
+    singular: 'Sound Design',
+    plural: 'Sound Design',
+  },
   admin: {
     useAsTitle: 'title',
   },
@@ -10,16 +14,16 @@ export const SoundDesign: CollectionConfig = {
   },
   fields: [
     {
-      name: 'title',
-      type: 'text',
-      required: true,
-    },
-    {
       name: 'year',
       type: 'number',
       required: true,
       min: 1900,
       max: new Date().getFullYear(),
+    },
+    {
+      name: 'title',
+      type: 'text',
+      required: true,
     },
     {
       name: 'platform',
