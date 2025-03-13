@@ -8,6 +8,7 @@ export const Curatorship: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'entity',
+    group: 'Site Pages',
   },
   access: {
     read: () => true,
@@ -37,6 +38,11 @@ export const Curatorship: CollectionConfig = {
       admin: {
         description: '2024 - 2025',
       },
+    },
+    {
+      name: 'url',
+      type: 'text',
+      required: false,
     },
   ],
 }

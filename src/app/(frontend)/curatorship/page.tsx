@@ -11,6 +11,7 @@ export default async function Page() {
       date: true,
       entity: true,
       role: true,
+      url: true,
     },
   })
 

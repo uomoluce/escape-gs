@@ -4,6 +4,7 @@ export const Events: CollectionConfig = {
   slug: 'events',
   admin: {
     useAsTitle: 'title',
+    group: 'Site Pages',
   },
   access: {
     read: () => true,
@@ -26,6 +27,11 @@ export const Events: CollectionConfig = {
       name: 'location',
       type: 'text',
       required: true,
+    },
+    {
+      name: 'url',
+      type: 'text',
+      required: false,
     },
   ],
 }

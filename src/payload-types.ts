@@ -711,6 +711,8 @@ export interface Discography {
    * e.g. 2:30
    */
   duration?: string | null;
+  media?: (number | null) | Media;
+  url?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -723,6 +725,7 @@ export interface Mix {
   year: number;
   title: string;
   platform: string;
+  url?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -735,6 +738,7 @@ export interface Event {
   year: number;
   title: string;
   location: string;
+  url?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -756,6 +760,7 @@ export interface Curatorship {
    * 2024 - 2025
    */
   date: string;
+  url?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -768,6 +773,8 @@ export interface SoundDesign {
   year: number;
   title: string;
   platform: string;
+  media?: (number | null) | Media;
+  url?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1328,6 +1335,8 @@ export interface DiscographySelect<T extends boolean = true> {
   label?: T;
   type?: T;
   duration?: T;
+  media?: T;
+  url?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1339,6 +1348,7 @@ export interface MixesSelect<T extends boolean = true> {
   year?: T;
   title?: T;
   platform?: T;
+  url?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1350,6 +1360,7 @@ export interface EventsSelect<T extends boolean = true> {
   year?: T;
   title?: T;
   location?: T;
+  url?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1361,6 +1372,7 @@ export interface CuratorshipSelect<T extends boolean = true> {
   entity?: T;
   role?: T;
   date?: T;
+  url?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1372,6 +1384,8 @@ export interface SoundDesignSelect<T extends boolean = true> {
   year?: T;
   title?: T;
   platform?: T;
+  media?: T;
+  url?: T;
   updatedAt?: T;
   createdAt?: T;
 }

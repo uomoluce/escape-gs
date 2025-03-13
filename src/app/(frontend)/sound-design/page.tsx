@@ -11,6 +11,8 @@ export default async function Page() {
       year: true,
       title: true,
       platform: true,
+      media: true,
+      url: true,
     },
   })
 

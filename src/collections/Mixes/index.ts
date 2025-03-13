@@ -4,6 +4,7 @@ export const Mixes: CollectionConfig = {
   slug: 'mixes',
   admin: {
     useAsTitle: 'title',
+    group: 'Site Pages',
   },
   access: {
     read: () => true,
@@ -26,6 +27,11 @@ export const Mixes: CollectionConfig = {
       type: 'text',
       required: true,
       label: 'Platform/Venue',
+    },
+    {
+      name: 'url',
+      type: 'text',
+      required: false,
     },
   ],
 }

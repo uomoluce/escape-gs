@@ -8,6 +8,7 @@ export const SoundDesign: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
+    group: 'Site Pages',
   },
   access: {
     read: () => true,
@@ -29,6 +30,16 @@ export const SoundDesign: CollectionConfig = {
       name: 'platform',
       type: 'text',
       required: true,
+    },
+    {
+      name: 'media',
+      type: 'upload',
+      relationTo: 'media',
+    },
+    {
+      name: 'url',
+      type: 'text',
+      required: false,
     },
   ],
 }

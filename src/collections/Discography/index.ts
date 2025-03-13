@@ -8,6 +8,7 @@ export const Discography: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
+    group: 'Site Pages',
   },
   access: {
     read: () => true,
@@ -56,6 +57,17 @@ export const Discography: CollectionConfig = {
       admin: {
         description: 'e.g. 2:30',
       },
+    },
+    {
+      name: 'media',
+      type: 'upload',
+      relationTo: 'media',
+      required: false,
+    },
+    {
+      name: 'url',
+      type: 'text',
+      required: false,
     },
   ],
 }

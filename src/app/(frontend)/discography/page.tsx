@@ -13,6 +13,7 @@ export default async function Page() {
       label: true,
       type: true,
       duration: true,
+      url: true,
     },
   })
 
