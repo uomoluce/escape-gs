@@ -17,7 +17,9 @@ export default async function Page() {
 
   const columns = [{ field: 'year', width: '100px' }, { field: 'title' }, { field: 'location' }]
 
-  return <CollectionList title="Events" columns={columns} items={events?.docs} />
+  return (
+    <CollectionList title="Events" columns={columns} items={events?.docs} collectionType="events" />
+  )
 }
 
 export function generateMetadata(): Metadata {

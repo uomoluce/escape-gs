@@ -27,7 +27,14 @@ export default async function Page() {
 
   console.log(discography, 'discography')
 
-  return <CollectionList title="Discography" columns={columns} items={discography?.docs} />
+  return (
+    <CollectionList
+      title="Discography"
+      columns={columns}
+      items={discography?.docs}
+      collectionType="discography"
+    />
+  )
 }
 
 export function generateMetadata(): Metadata {

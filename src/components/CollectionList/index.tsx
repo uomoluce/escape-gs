@@ -1,14 +1,15 @@
 import React from 'react'
+import { ListWrapper } from './ListWrapper'
 
 interface Column {
-  width?: string
   field: string
+  width?: string
 }
 
-interface CollectionListProps {
-  title: string
-  columns: Column[]
+interface Props {
   items: any[]
+  columns: Column[]
+  collectionType?: 'discography' | 'events' | 'curatorship' | 'default'
 }
 
 /**
@@ -20,24 +21,12 @@ interface CollectionListProps {
  *  - sound design
  * Designed to look like a table, but really a list of items wrapped in a css grid
  */
-export function CollectionList({ title, columns, items }: CollectionListProps) {
-  const gridTemplateColumns = columns.map((column) => column.width || '1fr').join(' ')
-
+export const CollectionList: React.FC<Props> = ({ items, columns, collectionType = 'default' }) => {
   return (
-    <div className="pt-24 pb-24">
-      <div className="container mb-16">
-        <div className="prose dark:prose-invert max-w-none">
-          <h1>{title}</h1>
-
-          {items?.map((item) => (
-            <div className="grid gap-x-4 gap-y-0" style={{ gridTemplateColumns }} key={item.id}>
-              {columns.map(({ field }) => (
-                <div key={field} className={field.toLowerCase()}>
-                  {item[field]}
-                </div>
-              ))}
-            </div>
-          ))}
+    <div className="px-6 md:px-12 lg:px-24">
+      <div className="collection-list">
+        <div className="collection-list__items w-full">
+          <ListWrapper items={items} columns={columns} collectionType={collectionType} />
         </div>
       </div>
     </div>

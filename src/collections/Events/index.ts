@@ -33,5 +33,10 @@ export const Events: CollectionConfig = {
       type: 'text',
       required: false,
     },
+    {
+      name: 'media',
+      type: 'upload',
+      relationTo: 'media',
+    },
   ],
 }

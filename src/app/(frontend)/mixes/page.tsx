@@ -12,10 +12,16 @@ export default async function Page() {
       title: true,
       platform: true,
       url: true,
+      media: true,
     },
   })
 
-  const columns = [{ field: 'year', width: '100px' }, { field: 'title' }, { field: 'platform' }]
+  const columns = [
+    { field: 'year', width: '100px' },
+    { field: 'play', width: '100px' },
+    { field: 'title' },
+    { field: 'platform' },
+  ]
 
   return <CollectionList title="Selected Mixes" columns={columns} items={mixes?.docs} />
 }

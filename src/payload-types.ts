@@ -707,11 +707,6 @@ export interface Discography {
    * e.g. 7", EP
    */
   type: string;
-  /**
-   * e.g. 2:30
-   */
-  duration?: string | null;
-  media?: (number | null) | Media;
   url?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -725,7 +720,12 @@ export interface Mix {
   year: number;
   title: string;
   platform: string;
+  media?: (number | null) | Media;
   url?: string | null;
+  /**
+   * e.g. 2:30
+   */
+  duration?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -739,6 +739,7 @@ export interface Event {
   title: string;
   location: string;
   url?: string | null;
+  media?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
 }
@@ -1334,8 +1335,6 @@ export interface DiscographySelect<T extends boolean = true> {
   title?: T;
   label?: T;
   type?: T;
-  duration?: T;
-  media?: T;
   url?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1348,7 +1347,9 @@ export interface MixesSelect<T extends boolean = true> {
   year?: T;
   title?: T;
   platform?: T;
+  media?: T;
   url?: T;
+  duration?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1361,6 +1362,7 @@ export interface EventsSelect<T extends boolean = true> {
   title?: T;
   location?: T;
   url?: T;
+  media?: T;
   updatedAt?: T;
   createdAt?: T;
 }

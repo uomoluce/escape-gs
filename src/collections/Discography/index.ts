@@ -43,28 +43,6 @@ export const Discography: CollectionConfig = {
       },
     },
     {
-      name: 'duration',
-      type: 'text',
-      required: false,
-      validate: (val: any) => {
-        // Optional: Validate duration format (e.g., "MM:SS" or "HH:MM:SS")
-        const durationRegex = /^(?:\d{1,2}:)?[0-5]?\d:[0-5]\d$/
-        if (!durationRegex.test(val)) {
-          return 'Please enter duration in format MM:SS or HH:MM:SS'
-        }
-        return true
-      },
-      admin: {
-        description: 'e.g. 2:30',
-      },
-    },
-    {
-      name: 'media',
-      type: 'upload',
-      relationTo: 'media',
-      required: false,
-    },
-    {
       name: 'url',
       type: 'text',
       required: false,

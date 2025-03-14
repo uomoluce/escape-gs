@@ -16,7 +16,12 @@ export default async function Page() {
     },
   })
 
-  const columns = [{ field: 'year', width: '100px' }, { field: 'title' }, { field: 'platform' }]
+  const columns = [
+    { field: 'year', width: '100px' },
+    { field: 'play', width: '100px' },
+    { field: 'title' },
+    { field: 'platform' },
+  ]
 
   return <CollectionList title="Sound Design" columns={columns} items={soundDesign?.docs} />
 }
