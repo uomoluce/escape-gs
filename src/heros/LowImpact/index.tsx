@@ -11,7 +11,7 @@ type LowImpactHeroType =
     }
   | (Omit<Page['hero'], 'richText'> & {
       children?: never
-      richText?: Page['hero']['richText']
+      richText?: NonNullable<Page['hero']>['richText']
     })
 
 export const LowImpactHero: React.FC<LowImpactHeroType> = ({ children, richText }) => {

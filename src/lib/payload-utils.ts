@@ -1,7 +1,8 @@
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+import type { CollectionSlug } from 'payload'
 
-export async function getPayloadData(collection: string, options = {}) {
+export async function getPayloadData<T extends CollectionSlug>(collection: T, options = {}) {
   const payload = await getPayload({ config: configPromise })
 
   return payload.find({

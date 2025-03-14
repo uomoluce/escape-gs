@@ -7,6 +7,7 @@ interface Column {
 }
 
 interface Props {
+  title?: string
   items: any[]
   columns: Column[]
   collectionType?: 'discography' | 'events' | 'curatorship' | 'default'

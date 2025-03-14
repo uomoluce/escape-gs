@@ -1,5 +1,4 @@
 import React from 'react'
-import { CustomComponent } from 'payload/types'
 
 function CircleLogo() {
   return (
@@ -9,5 +8,5 @@ function CircleLogo() {
   )
 }
 
-// Add the type assertion at the export level
-export default CircleLogo as CustomComponent
+// Remove the type import and use React.FC instead
+export default CircleLogo as React.FC

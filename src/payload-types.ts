@@ -64,6 +64,7 @@ export interface Config {
   auth: {
     users: UserAuthOperations;
   };
+  blocks: {};
   collections: {
     pages: Page;
     posts: Post;
@@ -171,6 +172,12 @@ export interface Page {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+  hero?: {
+    type?: 'highImpact' | 'lowImpact' | 'mediumImpact' | 'none'
+    links?: { link: any }[]
+    media?: any
+    richText?: any
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
