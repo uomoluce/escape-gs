@@ -23,7 +23,7 @@ interface Props {
  */
 export const CollectionList: React.FC<Props> = ({ items, columns, collectionType = 'default' }) => {
   return (
-    <div className="px-6 md:px-12 lg:px-24">
+    <div className="container">
       <div className="collection-list">
         <div className="collection-list__items w-full">
           <ListWrapper items={items} columns={columns} collectionType={collectionType} />

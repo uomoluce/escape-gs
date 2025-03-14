@@ -2,20 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
+@font-face {
+  font-family: 'Atlas Grotesk';
+  src: url('/fonts/AtlasGrotesk-Regular.woff2') format('woff2'),
+       url('/fonts/AtlasGrotesk-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   h1,
   h2,
   h3,
   h4,
   h5,
-  h6 {
-    font-size: unset;
+  h6,
+  p,
+  a,
+  button,
+  li {
+    font-size: var(--font-size-base);
     font-weight: unset;
+    line-height: var(--line-height-base);
   }
 
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 0 0% 0%;
 
     --card: 240 5% 96%;
     --card-foreground: 222.2 84% 4.9%;
@@ -47,11 +63,16 @@
     --success: 196 52% 74%;
     --warning: 34 89% 85%;
     --error: 10 100% 86%;
+
+    --font-sans: 'Atlas Grotesk', system-ui, sans-serif;
+    --font-size-base: 14px;
+    --line-height-base: 1.5;
+    --letter-spacing: -0.01em;
   }
 
   [data-theme='dark'] {
     --background: 0 0% 0%;
-    --foreground: 210 40% 98%;
+    --foreground: 0 0% 100%;
 
     --card: 0 0% 4%;
     --card-foreground: 210 40% 98%;
@@ -88,8 +109,31 @@
   * {
     @apply border-border;
   }
+  html,
   body {
     @apply bg-background text-foreground min-h-[100vh] flex flex-col;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    letter-spacing: var(--letter-spacing);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a {
+    @apply text-foreground no-underline hover:opacity-75 transition-opacity;
+  }
+
+  nav a {
+    @apply text-foreground;
+  }
+
+  button {
+    font-family: var(--font-sans);
+    @apply bg-transparent border-0 cursor-pointer text-inherit p-0;
+  }
+
+  nav {
+    font-size: var(--font-size-base);
   }
 }
 

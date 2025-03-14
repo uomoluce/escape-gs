@@ -39,7 +39,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
         </>
         <ThemeSelector />
       </div>
-      <div className="py-8 flex justify-between">
+      <div className="py-20 flex justify-between">
         <HeaderNav data={data} />
       </div>
     </header>

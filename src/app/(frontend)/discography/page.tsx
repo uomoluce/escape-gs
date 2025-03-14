@@ -22,7 +22,7 @@ export default async function Page() {
     { field: 'title' },
     { field: 'label' },
     { field: 'type' },
-    { field: 'duration', width: '100px' },
+    // { field: 'duration', width: '100px' },
   ]
 
   console.log(discography, 'discography')

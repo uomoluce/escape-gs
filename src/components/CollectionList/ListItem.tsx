@@ -89,7 +89,11 @@ export const ListItem: React.FC<ListItemProps> = ({
     return (
       <button
         onClick={handlePlayClick}
-        className={`inline-flex items-center ${hasPlayableContent ? 'hover:opacity-75' : 'opacity-90 cursor-not-allowed'}`}
+        className={`inline-flex items-center ${
+          hasPlayableContent
+            ? 'hover:opacity-75 transition-opacity'
+            : 'opacity-50 cursor-not-allowed'
+        }`}
         disabled={!hasPlayableContent}
       >
         {isPlaying && isAudioVisible ? 'PAUSE' : 'PLAY'}
@@ -114,7 +118,7 @@ export const ListItem: React.FC<ListItemProps> = ({
 
     if (isAudioVisible && isPlaying) {
       return (
-        <div className="text-sm tabular-nums text-right">
+        <div className="text-sm text-right tabular-nums">
           {formatTime(currentTime)} / {formatTime(duration)}
         </div>
       )
@@ -137,9 +141,9 @@ export const ListItem: React.FC<ListItemProps> = ({
     >
       <div></div>
       <div className="col-span-full flex items-center">
-        <div className="flex-grow bg-gray-200 h-[6px]">
+        <div className="flex-grow bg-border h-[2px]">
           <div
-            className="bg-black h-full transition-all duration-100"
+            className="bg-foreground h-full transition-all duration-100"
             style={{ width: `${(currentTime / duration) * 100}%` }}
           />
         </div>
