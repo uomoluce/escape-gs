@@ -109,27 +109,39 @@ export const ListItem: React.FC<ListItemProps> = ({
     return item.title
   }
 
+  const renderDuration = () => {
+    if (!item.media?.mimeType) return item.duration || null
+
+    if (isAudioVisible && isPlaying) {
+      return (
+        <div className="text-sm tabular-nums text-right">
+          {formatTime(currentTime)} / {formatTime(duration)}
+        </div>
+      )
+    }
+
+    return <div className="text-sm tabular-nums text-right">{formatTime(duration)}</div>
+  }
+
   const renderCell = (field: string) => {
     if (field === 'play') return renderPlayButton()
     if (field === 'title') return renderTitle()
+    if (field === 'duration') return renderDuration()
     return item[field]
   }
 
   const renderAudioPlayer = () => (
     <div
-      className="grid gap-x-4 w-[cal(100%-116px)] ml-[116px] mb-3"
+      className="grid gap-y-2 w-[calc(100%-116px)] ml-[116px] mb-4"
       style={{ gridTemplateColumns }}
     >
       <div></div>
       <div className="col-span-full flex items-center">
-        <div className="flex-grow bg-gray-200 h-[2px]">
+        <div className="flex-grow bg-gray-200 h-[6px]">
           <div
             className="bg-black h-full transition-all duration-100"
             style={{ width: `${(currentTime / duration) * 100}%` }}
           />
-        </div>
-        <div className="ml-4 text-sm tabular-nums">
-          {formatTime(currentTime)} / {formatTime(duration)}
         </div>
         <audio
           ref={audioRef}

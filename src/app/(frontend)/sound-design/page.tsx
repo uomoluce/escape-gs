@@ -21,6 +21,7 @@ export default async function Page() {
     { field: 'play', width: '100px' },
     { field: 'title' },
     { field: 'platform' },
+    { field: 'duration', width: '150px' },
   ]
 
   return <CollectionList title="Sound Design" columns={columns} items={soundDesign?.docs} />
