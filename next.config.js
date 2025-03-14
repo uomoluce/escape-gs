@@ -1,4 +1,5 @@
 import { withPayload } from '@payloadcms/next/withPayload'
+import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 
 import redirects from './redirects.js'
 
@@ -22,6 +23,14 @@ const nextConfig = {
   },
   reactStrictMode: true,
   redirects,
+  plugins: [
+    vercelBlobStorage({
+      collections: {
+        media: true, // Enable for the media collection
+      },
+      token: process.env.BLOB_READ_WRITE_TOKEN || '',
+    }),
+  ],
 }
 
-export default withPayload(nextConfig)
+export default withPayload(nextConfig, { devBundleServerPackages: false })
