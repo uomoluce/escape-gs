@@ -752,6 +752,10 @@ export interface Discography {
    */
   type: string;
   url?: string | null;
+  /**
+   * Upload an audio file (MP3)
+   */
+  audio?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
 }
@@ -764,12 +768,8 @@ export interface Mix {
   year: number;
   title: string;
   platform: string;
-  media?: (number | null) | Media;
   url?: string | null;
-  /**
-   * e.g. 2:30
-   */
-  duration?: string | null;
+  audio?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
 }
@@ -783,7 +783,8 @@ export interface Event {
   title: string;
   location: string;
   url?: string | null;
-  media?: (number | null) | Media;
+  audio?: (number | null) | Media;
+  image?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
 }
@@ -806,6 +807,10 @@ export interface Curatorship {
    */
   date: string;
   url?: string | null;
+  /**
+   * Upload an audio file (MP3)
+   */
+  audio?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
 }
@@ -818,8 +823,8 @@ export interface SoundDesign {
   year: number;
   title: string;
   platform: string;
-  media?: (number | null) | Media;
   url?: string | null;
+  audio?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
 }
@@ -1402,6 +1407,7 @@ export interface DiscographySelect<T extends boolean = true> {
   label?: T;
   type?: T;
   url?: T;
+  audio?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1413,9 +1419,8 @@ export interface MixesSelect<T extends boolean = true> {
   year?: T;
   title?: T;
   platform?: T;
-  media?: T;
   url?: T;
-  duration?: T;
+  audio?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1428,7 +1433,8 @@ export interface EventsSelect<T extends boolean = true> {
   title?: T;
   location?: T;
   url?: T;
-  media?: T;
+  audio?: T;
+  image?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1441,6 +1447,7 @@ export interface CuratorshipSelect<T extends boolean = true> {
   role?: T;
   date?: T;
   url?: T;
+  audio?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1452,8 +1459,8 @@ export interface SoundDesignSelect<T extends boolean = true> {
   year?: T;
   title?: T;
   platform?: T;
-  media?: T;
   url?: T;
+  audio?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -32,14 +32,14 @@ export const SoundDesign: CollectionConfig = {
       required: true,
     },
     {
-      name: 'media',
-      type: 'upload',
-      relationTo: 'media',
-    },
-    {
       name: 'url',
       type: 'text',
       required: false,
+    },
+    {
+      name: 'audio',
+      type: 'upload',
+      relationTo: 'media',
     },
   ],
 }

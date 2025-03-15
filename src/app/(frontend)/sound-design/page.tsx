@@ -11,13 +11,13 @@ export default async function Page() {
       year: true,
       title: true,
       platform: true,
-      media: true,
       url: true,
+      audio: true,
     },
   })
 
   const columns = [
-    { field: 'year', width: '100px' },
+    { field: 'year', width: '60px' },
     { field: 'play', width: '100px' },
     { field: 'title' },
     { field: 'platform' },

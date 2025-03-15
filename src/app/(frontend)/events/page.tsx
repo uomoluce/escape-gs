@@ -12,10 +12,18 @@ export default async function Page() {
       year: true,
       location: true,
       url: true,
+      audio: true,
+      image: true,
     },
   })
 
-  const columns = [{ field: 'year', width: '100px' }, { field: 'title' }, { field: 'location' }]
+  const columns = [
+    { field: 'year', width: '60px' },
+    { field: 'play', width: '100px' },
+    { field: 'title' },
+    { field: 'location' },
+    { field: 'duration', width: '150px' },
+  ]
 
   return (
     <CollectionList title="Events" columns={columns} items={events?.docs} collectionType="events" />

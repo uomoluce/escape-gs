@@ -6,7 +6,7 @@ import Link from 'next/link'
 interface ListItemProps {
   item: any
   columns: Array<{ field: string; width?: string }>
-  collectionType?: 'discography' | 'events' | 'curatorship' | 'default'
+  collectionType?: string
   isAudioVisible: boolean
   onAudioToggle: () => void
 }
@@ -24,8 +24,8 @@ export const ListItem: React.FC<ListItemProps> = ({
   const audioRef = useRef<HTMLAudioElement>(null)
   const gridTemplateColumns = columns.map((col) => col.width || '1fr').join(' ')
 
-  const hasPlayableContent = item.media?.mimeType === 'audio/mpeg' || item.url
-  const isClickableTitleType = ['discography', 'events', 'curatorship'].includes(collectionType)
+  const hasPlayableContent = item.audio?.mimeType === 'audio/mpeg'
+  const hasExternalUrl = Boolean(item.url)
 
   useEffect(() => {
     if (audioRef.current) {
@@ -66,55 +66,56 @@ export const ListItem: React.FC<ListItemProps> = ({
 
   const handlePlayClick = () => {
     if (!hasPlayableContent) return
-    if (item.media?.mimeType === 'audio/mpeg') {
-      if (isAudioVisible && audioRef.current) {
-        if (isPlaying) {
-          audioRef.current.pause()
-          setIsPlaying(false)
-        } else {
-          audioRef.current.play()
-          setIsPlaying(true)
-        }
+
+    if (isAudioVisible && audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause()
+        setIsPlaying(false)
       } else {
-        onAudioToggle()
+        audioRef.current.play()
+        setIsPlaying(true)
       }
-    } else if (item.url) {
-      window.open(item.url, '_blank')
+    } else {
+      onAudioToggle()
     }
   }
 
   const renderPlayButton = () => {
-    if (isClickableTitleType) return null
+    if (!hasPlayableContent) return null
 
     return (
       <button
         onClick={handlePlayClick}
-        className={`inline-flex items-center ${
-          hasPlayableContent
-            ? 'hover:opacity-75 transition-opacity'
-            : 'opacity-50 cursor-not-allowed'
-        }`}
-        disabled={!hasPlayableContent}
+        className="inline-flex items-center hover:opacity-75 transition-opacity"
       >
         {isPlaying && isAudioVisible ? 'PAUSE' : 'PLAY'}
-        {item.url && !item.media?.mimeType && <ExternalLinkIcon />}
       </button>
     )
   }
 
   const renderTitle = () => {
-    if (isClickableTitleType && item.url) {
+    const titleContent = (
+      <span className={hasExternalUrl ? 'hover:opacity-75 transition-opacity' : ''}>
+        {item.title}
+      </span>
+    )
+
+    if (hasExternalUrl) {
       return (
-        <Link href={item.url} target="_blank" className="hover:opacity-75">
-          {item.title}
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href={item.url} target="_blank" className="hover:opacity-75">
+            {titleContent}
+          </Link>
+          {/* <ExternalLinkIcon /> */}
+        </div>
       )
     }
-    return item.title
+
+    return titleContent
   }
 
   const renderDuration = () => {
-    if (!item.media?.mimeType) return item.duration || null
+    if (!item.audio?.mimeType) return item.duration || null
 
     if (isAudioVisible && isPlaying) {
       return (
@@ -155,7 +156,7 @@ export const ListItem: React.FC<ListItemProps> = ({
             setCurrentTime(0)
           }}
         >
-          <source src={item.media.url} type="audio/mpeg" />
+          <source src={item.audio.url} type="audio/mpeg" />
         </audio>
       </div>
     </div>
@@ -170,18 +171,26 @@ export const ListItem: React.FC<ListItemProps> = ({
           </div>
         ))}
       </div>
-      {item.media?.mimeType === 'audio/mpeg' && isAudioVisible && renderAudioPlayer()}
+      {hasPlayableContent && isAudioVisible && renderAudioPlayer()}
     </div>
   )
 }
 
 const ExternalLinkIcon = () => (
-  <svg className="w-4 h-4 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-    />
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="inline-block"
+  >
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    <polyline points="15 3 21 3 21 9" />
+    <line x1="10" y1="14" x2="21" y2="3" />
   </svg>
 )

@@ -18,7 +18,7 @@ export default async function Page() {
   })
 
   const columns = [
-    { field: 'year', width: '100px' },
+    { field: 'year', width: '60px' },
     { field: 'title' },
     { field: 'label' },
     { field: 'type' },

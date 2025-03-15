@@ -34,7 +34,12 @@ export const Events: CollectionConfig = {
       required: false,
     },
     {
-      name: 'media',
+      name: 'audio',
+      type: 'upload',
+      relationTo: 'media',
+    },
+    {
+      name: 'image',
       type: 'upload',
       relationTo: 'media',
     },

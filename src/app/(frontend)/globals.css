@@ -64,10 +64,10 @@
     --warning: 34 89% 85%;
     --error: 10 100% 86%;
 
-    --font-sans: 'Atlas Grotesk', system-ui, sans-serif;
+    --font-sans: Arial, 'Atlas Grotesk', system-ui, sans-serif;
     --font-size-base: 14px;
     --line-height-base: 1.5;
-    --letter-spacing: -0.01em;
+    --letter-spacing: 0.02em;
   }
 
   [data-theme='dark'] {
@@ -123,17 +123,13 @@
     @apply text-foreground no-underline hover:opacity-75 transition-opacity;
   }
 
-  nav a {
+  /* nav a {
     @apply text-foreground;
-  }
+  } */
 
   button {
     font-family: var(--font-sans);
     @apply bg-transparent border-0 cursor-pointer text-inherit p-0;
-  }
-
-  nav {
-    font-size: var(--font-size-base);
   }
 }
 

@@ -44,5 +44,13 @@ export const Curatorship: CollectionConfig = {
       type: 'text',
       required: false,
     },
+    {
+      name: 'audio',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: 'Upload an audio file (MP3)',
+      },
+    },
   ],
 }
