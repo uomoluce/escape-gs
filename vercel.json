@@ -1,8 +1,20 @@
 {
   "crons": [
     {
-        "path": "/api/payload-jobs/run",
-         "schedule": "0 0 * * *"
+      "path": "/api/payload-jobs/run",
+      "schedule": "0 0 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "api/**/*": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  },
+  "pool": {
+    "max": 5,
+    "min": 0,
+    "idleTimeoutMillis": 30000,
+    "acquireTimeoutMillis": 30000
+  }
 }
