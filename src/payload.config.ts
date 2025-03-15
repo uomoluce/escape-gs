@@ -77,7 +77,10 @@ export default buildConfig({
               rejectUnauthorized: false,
             }
           : false,
-      max: 10,
+      max: 5,
+      min: 0,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 30000,
     },
   }),
   collections: [
