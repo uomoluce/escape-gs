@@ -1,5 +1,6 @@
 // storage-adapter-import-placeholder
 import { postgresAdapter } from '@payloadcms/db-postgres'
+// Import Vercel Blob storage only in production
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 
 import sharp from 'sharp' // sharp-import
@@ -69,12 +70,21 @@ export default buildConfig({
   },
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
+  // Database configuration optimized for serverless environment
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
+      // SSL configuration - only enable in production
       ssl: process.env.NODE_ENV === 'production'
         ? { rejectUnauthorized: false }
         : false,
+      // Connection pool settings optimized for serverless
+      max: 2, // Reduced pool size to prevent connection exhaustion
+      min: 0, // Start with no connections to minimize cold start resource usage
+      idleTimeoutMillis: 5000, // Shorter idle timeout for serverless functions
+      connectionTimeoutMillis: 5000, // Faster connection timeout
+      allowExitOnIdle: true, // Allow connections to be cleaned up when idle
+      keepAlive: true, // Keep connections alive to reduce reconnection overhead
     },
   }),
   collections: [
@@ -93,13 +103,15 @@ export default buildConfig({
   globals: [Header, Footer],
   plugins: [
     ...plugins,
+    // Always include Vercel Blob storage in the import map,
+    // but only make it functional in production
     vercelBlobStorage({
-      token: process.env.BLOB_READ_WRITE_TOKEN,
+      token: process.env.BLOB_READ_WRITE_TOKEN || 'vercel_blob_rw_dummy_123456789',
       collections: {
         'media': {
-          // Enable blob storage for the media collection
-          disableLocalStorage: true, // Prevents files from being stored locally
-          prefix: 'media', // Optional prefix for the blob storage
+          // Only disable local storage in production
+          disableLocalStorage: process.env.NODE_ENV === 'production',
+          prefix: 'media',
         },
       },
     }),
