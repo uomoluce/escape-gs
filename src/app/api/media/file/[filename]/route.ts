@@ -1,17 +1,12 @@
 import { list } from '@vercel/blob';
 import { NextRequest, NextResponse } from 'next/server';
 
-type RouteParams = {
-  params: {
-    filename: string
-  }
-}
-
+// Updated type definition to match Next.js App Router conventions
 export async function GET(
   request: NextRequest,
-  context: RouteParams
+  { params }: { params: { filename: string } }
 ) {
-  const filename = context.params.filename;
+  const filename = params.filename;
   
   try {
     // List blobs with the specified filename prefix
