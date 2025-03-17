@@ -23,6 +23,7 @@ export default async function Page() {
       columns={columns}
       items={curatorship?.docs}
       collectionType="curatorship"
+      sortBy="date"
     />
   )
 }

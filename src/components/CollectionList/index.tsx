@@ -10,7 +10,8 @@ interface Props {
   title?: string
   items: any[]
   columns: Column[]
-  collectionType?: 'discography' | 'events' | 'curatorship' | 'default'
+  collectionType?: 'discography' | 'events' | 'curatorship' | 'mixes' | 'sound-design' | 'default'
+  sortBy?: string
 }
 
 /**
@@ -22,12 +23,32 @@ interface Props {
  *  - sound design
  * Designed to look like a table, but really a list of items wrapped in a css grid
  */
-export const CollectionList: React.FC<Props> = ({ items, columns, collectionType = 'default' }) => {
+export const CollectionList: React.FC<Props> = ({ 
+  items, 
+  columns, 
+  collectionType = 'default',
+  sortBy = 'date'
+}) => {
+  // Sort items by date in descending order (newest first)
+  const sortedItems = [...items].sort((a, b) => {
+    const aValue = a[sortBy] || a.year || a.createdAt;
+    const bValue = b[sortBy] || b.year || b.createdAt;
+    
+    if (!aValue) return 1;
+    if (!bValue) return -1;
+    
+    const aDate = typeof aValue === 'string' ? new Date(aValue) : aValue;
+    const bDate = typeof bValue === 'string' ? new Date(bValue) : bValue;
+    
+    // Always sort in descending order (newest first)
+    return bDate < aDate ? -1 : bDate > aDate ? 1 : 0;
+  });
+
   return (
     <div className="container">
       <div className="collection-list">
         <div className="collection-list__items w-full">
-          <ListWrapper items={items} columns={columns} collectionType={collectionType} />
+          <ListWrapper items={sortedItems} columns={columns} collectionType={collectionType} />
         </div>
       </div>
     </div>

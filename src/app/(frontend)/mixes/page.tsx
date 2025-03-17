@@ -9,6 +9,7 @@ export default async function Page() {
   const mixes = await getPayloadData('mixes', {
     select: {
       year: true,
+      date: true,
       title: true,
       platform: true,
       url: true,
@@ -24,7 +25,15 @@ export default async function Page() {
     { field: 'duration', width: '150px' },
   ]
 
-  return <CollectionList title="Selected Mixes" columns={columns} items={mixes?.docs} />
+  return (
+    <CollectionList 
+      title="Selected Mixes" 
+      columns={columns} 
+      items={mixes?.docs} 
+      collectionType="mixes" 
+      sortBy="year"
+    />
+  )
 }
 
 export function generateMetadata(): Metadata {

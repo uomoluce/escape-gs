@@ -6,7 +6,7 @@ import { ListItem } from './ListItem'
 interface Props {
   items: any[]
   columns: Array<{ field: string; width?: string }>
-  collectionType?: 'discography' | 'events' | 'curatorship' | 'default'
+  collectionType?: 'discography' | 'events' | 'curatorship' | 'mixes' | 'sound-design' | 'default'
 }
 
 export const ListWrapper: React.FC<Props> = ({ items, columns, collectionType = 'default' }) => {

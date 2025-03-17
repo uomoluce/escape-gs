@@ -33,6 +33,7 @@ export default async function Page() {
       columns={columns}
       items={discography?.docs}
       collectionType="discography"
+      sortBy="year"
     />
   )
 }

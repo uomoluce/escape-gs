@@ -9,6 +9,7 @@ export default async function Page() {
   const soundDesign = await getPayloadData('sound-design', {
     select: {
       year: true,
+      date: true,
       title: true,
       platform: true,
       url: true,
@@ -24,7 +25,15 @@ export default async function Page() {
     { field: 'duration', width: '150px' },
   ]
 
-  return <CollectionList title="Sound Design" columns={columns} items={soundDesign?.docs} />
+  return (
+    <CollectionList 
+      title="Sound Design" 
+      columns={columns} 
+      items={soundDesign?.docs} 
+      collectionType="sound-design" 
+      sortBy="year" 
+    />
+  )
 }
 
 export function generateMetadata(): Metadata {

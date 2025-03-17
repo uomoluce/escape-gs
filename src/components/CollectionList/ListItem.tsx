@@ -2,11 +2,12 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface ListItemProps {
   item: any
   columns: Array<{ field: string; width?: string }>
-  collectionType?: string
+  collectionType?: 'discography' | 'events' | 'curatorship' | 'mixes' | 'sound-design' | 'default'
   isAudioVisible: boolean
   onAudioToggle: () => void
 }
@@ -21,11 +22,14 @@ export const ListItem: React.FC<ListItemProps> = ({
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
+  const [showImage, setShowImage] = useState(false)
+  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 })
   const audioRef = useRef<HTMLAudioElement>(null)
   const gridTemplateColumns = columns.map((col) => col.width || '1fr').join(' ')
 
   const hasPlayableContent = item.audio?.mimeType === 'audio/mpeg'
   const hasExternalUrl = Boolean(item.url)
+  const hasImage = Boolean(item.image?.url)
 
   useEffect(() => {
     if (audioRef.current) {
@@ -80,6 +84,16 @@ export const ListItem: React.FC<ListItemProps> = ({
     }
   }
 
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (hasImage) {
+      // Calculate position with offset to prevent image from being under cursor
+      setCursorPosition({ 
+        x: e.clientX + 20, 
+        y: e.clientY + 20 
+      })
+    }
+  }
+
   const renderPlayButton = () => {
     if (!hasPlayableContent) return null
 
@@ -95,7 +109,12 @@ export const ListItem: React.FC<ListItemProps> = ({
 
   const renderTitle = () => {
     const titleContent = (
-      <span className={hasExternalUrl ? 'hover:opacity-75 transition-opacity' : ''}>
+      <span 
+        className={`${hasExternalUrl ? 'hover:opacity-75 transition-opacity' : ''} ${hasImage ? 'relative' : ''}`}
+        onMouseEnter={() => hasImage && setShowImage(true)}
+        onMouseLeave={() => hasImage && setShowImage(false)}
+        onMouseMove={handleMouseMove}
+      >
         {item.title}
       </span>
     )
@@ -103,10 +122,17 @@ export const ListItem: React.FC<ListItemProps> = ({
     if (hasExternalUrl) {
       return (
         <div className="flex items-center gap-2">
-          <Link href={item.url} target="_blank" className="hover:opacity-75">
+          <Link 
+            href={item.url} 
+            target="_blank" 
+            className="hover:opacity-75"
+            onMouseEnter={() => hasImage && setShowImage(true)}
+            onMouseLeave={() => hasImage && setShowImage(false)}
+            onMouseMove={handleMouseMove}
+          >
             {titleContent}
           </Link>
-          {/* <ExternalLinkIcon /> */}
+          <ExternalLinkIcon />
         </div>
       )
     }
@@ -172,6 +198,29 @@ export const ListItem: React.FC<ListItemProps> = ({
         ))}
       </div>
       {hasPlayableContent && isAudioVisible && renderAudioPlayer()}
+      {/* Render the hovering image at the document level to avoid containment issues */}
+      {hasImage && showImage && (
+        <div 
+          className="fixed z-50 shadow-lg overflow-hidden pointer-events-none"
+          style={{ 
+            left: `${cursorPosition.x}px`, 
+            top: `${cursorPosition.y}px`,
+            transition: 'left 0.05s, top 0.05s'
+          }}
+        >
+          <Image 
+            src={item.image.url} 
+            alt={item.title || 'Event image'} 
+            width={300}
+            height={200}
+            className="object-contain max-w-[300px] max-h-[200px] w-auto h-auto"
+            style={{ 
+              width: 'auto', 
+              height: 'auto'
+            }}
+          />
+        </div>
+      )}
     </div>
   )
 }

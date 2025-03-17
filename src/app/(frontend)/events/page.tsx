@@ -10,6 +10,7 @@ export default async function Page() {
     select: {
       title: true,
       year: true,
+      date: true,
       location: true,
       url: true,
       audio: true,
@@ -26,7 +27,13 @@ export default async function Page() {
   ]
 
   return (
-    <CollectionList title="Events" columns={columns} items={events?.docs} collectionType="events" />
+    <CollectionList 
+      title="Events" 
+      columns={columns} 
+      items={events?.docs} 
+      collectionType="events" 
+      sortBy="date"
+    />
   )
 }
 
