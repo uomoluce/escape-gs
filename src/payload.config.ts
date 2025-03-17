@@ -103,19 +103,18 @@ export default buildConfig({
   globals: [Header, Footer],
   plugins: [
     ...plugins,
-    // Always include Vercel Blob storage in the import map
+    // Configure Vercel Blob Storage following best practices
     vercelBlobStorage({
       token: process.env.BLOB_READ_WRITE_TOKEN || 'vercel_blob_rw_dummy_123456789',
       collections: {
-        'media': {
-          // Only disable local storage in production
+        [Media.slug]: {
+          // Only use local storage in development
           disableLocalStorage: process.env.NODE_ENV === 'production',
-          // Add this option to fix relationship issues
-          generateFileURL: ({ filename }) => {
-            // In development, return a dummy URL to prevent errors
-            if (process.env.NODE_ENV !== 'production') {
-              return `/api/media/file/${filename}`;
-            }
+          // Enable client-side uploads for large files
+          clientUploads: true,
+          // Configure URL generation to use our custom API route
+          generateFileURL: ({ filename }: { filename: string }) => {
+            // Use the custom API route to handle file serving
             return `${process.env.NEXT_PUBLIC_SERVER_URL}/api/media/file/${filename}`;
           },
         },

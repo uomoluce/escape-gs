@@ -137,7 +137,7 @@ export const ListItem: React.FC<ListItemProps> = ({
 
   const renderAudioPlayer = () => (
     <div
-      className="grid gap-y-2 w-[calc(100%-116px)] ml-[116px] mb-4"
+      className="grid gap-y-2 w-[calc(100%-76px)] ml-[76px] mb-4"
       style={{ gridTemplateColumns }}
     >
       <div></div>
