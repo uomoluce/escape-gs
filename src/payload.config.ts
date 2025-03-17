@@ -103,23 +103,24 @@ export default buildConfig({
   globals: [Header, Footer],
   plugins: [
     ...plugins,
-    // Only use Vercel Blob storage in production to avoid timeouts in development
-    ...(process.env.NODE_ENV === 'production'
-      ? [
-          vercelBlobStorage({
-            token: process.env.BLOB_READ_WRITE_TOKEN,
-            collections: {
-              'media': {
-                disableLocalStorage: true,
-                // Add this option to fix relationship issues
-                generateFileURL: ({ filename }) => {
-                  return `${process.env.NEXT_PUBLIC_SERVER_URL}/api/media/file/${filename}`;
-                },
-              },
-            },
-          }),
-        ]
-      : []),
+    // Always include Vercel Blob storage in the import map
+    vercelBlobStorage({
+      token: process.env.BLOB_READ_WRITE_TOKEN || 'vercel_blob_rw_dummy_123456789',
+      collections: {
+        'media': {
+          // Only disable local storage in production
+          disableLocalStorage: process.env.NODE_ENV === 'production',
+          // Add this option to fix relationship issues
+          generateFileURL: ({ filename }) => {
+            // In development, return a dummy URL to prevent errors
+            if (process.env.NODE_ENV !== 'production') {
+              return `/api/media/file/${filename}`;
+            }
+            return `${process.env.NEXT_PUBLIC_SERVER_URL}/api/media/file/${filename}`;
+          },
+        },
+      },
+    }),
   ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
