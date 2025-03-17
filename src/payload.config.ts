@@ -111,7 +111,6 @@ export default buildConfig({
         'media': {
           // Only disable local storage in production
           disableLocalStorage: process.env.NODE_ENV === 'production',
-          prefix: 'media',
         },
       },
     }),
