@@ -1,11 +1,17 @@
 import { list } from '@vercel/blob';
 import { NextRequest, NextResponse } from 'next/server';
 
+type RouteParams = {
+  params: {
+    filename: string
+  }
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { filename: string } }
+  context: RouteParams
 ) {
-  const filename = params.filename;
+  const filename = context.params.filename;
   
   try {
     // List blobs with the specified filename prefix
