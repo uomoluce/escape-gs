@@ -78,13 +78,13 @@ export default buildConfig({
       ssl: process.env.NODE_ENV === 'production'
         ? { rejectUnauthorized: false }
         : false,
-      // Connection pool settings optimized for serverless
-      max: 1, // Minimal pool size to reduce initialization overhead
+      // Connection pool settings optimized for migrations and serverless
+      max: 3, // Allow more connections for migrations
       min: 0, // Start with no connections
-      idleTimeoutMillis: 3000, // Very short idle timeout
-      connectionTimeoutMillis: 3000, // Very short connection timeout
+      idleTimeoutMillis: 30000, // Longer timeout for migrations
+      connectionTimeoutMillis: 30000, // Longer connection timeout for migrations
       allowExitOnIdle: true,
-      keepAlive: false, // Disable keep-alive to reduce overhead
+      keepAlive: true, // Enable keep-alive for more stable connections
     },
   }),
   collections: [
