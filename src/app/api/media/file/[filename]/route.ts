@@ -8,22 +8,39 @@ export async function GET(
   const { filename } = await params;
   
   try {
-    // List blobs with the specified filename prefix
-    const { blobs } = await list({
-      prefix: `media/${filename}`
+    // Get all blobs to search through them
+    // This works better for smaller blob stores (up to a few hundred files)
+    const { blobs } = await list();
+    
+    // Search for files that match or contain our filename
+    const matchingBlobs = blobs.filter(blob => {
+      const pathParts = blob.pathname.split('/');
+      const blobFilename = pathParts[pathParts.length - 1];
+      
+      // Check if pathname ends with our filename
+      return blob.pathname.endsWith(`/${filename}`) || 
+             blob.pathname === filename ||
+             blobFilename === filename ||
+             blob.pathname === `media/${filename}`;
     });
-
-    // Find the exact blob that matches our filename
-    const blob = blobs.find(b => b.pathname === `media/${filename}` || b.pathname.endsWith(`/${filename}`));
+    
+    // Sort matching blobs by most specific match first
+    const sortedBlobs = matchingBlobs.sort((a, b) => {
+      // Exact matches should come first
+      if (a.pathname === `media/${filename}` || a.pathname === filename) return -1;
+      if (b.pathname === `media/${filename}` || b.pathname === filename) return 1;
+      return 0;
+    });
+    
+    // Use the best match or fallback to any match
+    const blob = sortedBlobs[0];
     
     if (blob) {
-      // If found in Vercel Blob, redirect to the Vercel Blob URL
-      console.log(`File ${filename} found in Vercel Blob, redirecting to: ${blob.url}`);
+      // If found, redirect to the Vercel Blob URL
       return NextResponse.redirect(blob.url);
     }
     
-    // If not found in Vercel Blob, return a 404
-    console.log(`File ${filename} not found in Vercel Blob`);
+    // If nothing found, return a 404
     return new NextResponse('File not found', { status: 404 });
   } catch (error) {
     console.error('Error serving file from Vercel Blob:', error);

@@ -161,32 +161,42 @@ export const ListItem: React.FC<ListItemProps> = ({
     return item[field]
   }
 
-  const renderAudioPlayer = () => (
-    <div
-      className="grid gap-y-2 w-[calc(100%-76px)] ml-[76px] mb-4"
-      style={{ gridTemplateColumns }}
-    >
-      <div></div>
-      <div className="col-span-full flex items-center">
-        <div className="flex-grow bg-border h-[2px]">
-          <div
-            className="bg-foreground h-full transition-all duration-100"
-            style={{ width: `${(currentTime / duration) * 100}%` }}
-          />
+  const renderAudioPlayer = () => {
+    // Use audio URL directly
+    const audioUrl = item.audio?.url || '';
+    
+    return (
+      <div
+        className="grid gap-y-2 w-[calc(100%-76px)] ml-[76px] mb-4"
+        style={{ gridTemplateColumns }}
+      >
+        <div></div>
+        <div className="col-span-full flex items-center">
+          <div className="flex-grow bg-border h-[2px]">
+            <div
+              className="bg-foreground h-full transition-all duration-100"
+              style={{ width: `${(currentTime / duration) * 100}%` }}
+            />
+          </div>
+          <audio
+            ref={audioRef}
+            className="hidden"
+            crossOrigin="anonymous"
+            preload="metadata"
+            onEnded={() => {
+              setIsPlaying(false)
+              setCurrentTime(0)
+            }}
+            onError={(e) => {
+              console.error('Audio playback error:', e);
+            }}
+          >
+            <source src={audioUrl} type={item.audio?.mimeType || 'audio/mpeg'} />
+          </audio>
         </div>
-        <audio
-          ref={audioRef}
-          className="hidden"
-          onEnded={() => {
-            setIsPlaying(false)
-            setCurrentTime(0)
-          }}
-        >
-          <source src={item.audio.url} type="audio/mpeg" />
-        </audio>
       </div>
-    </div>
-  )
+    )
+  }
 
   return (
     <div className="contents">
