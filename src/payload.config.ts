@@ -79,12 +79,12 @@ export default buildConfig({
         ? { rejectUnauthorized: false }
         : false,
       // Connection pool settings optimized for serverless
-      max: 2, // Reduced pool size to prevent connection exhaustion
-      min: 0, // Start with no connections to minimize cold start resource usage
-      idleTimeoutMillis: 5000, // Shorter idle timeout for serverless functions
-      connectionTimeoutMillis: 5000, // Faster connection timeout
-      allowExitOnIdle: true, // Allow connections to be cleaned up when idle
-      keepAlive: true, // Keep connections alive to reduce reconnection overhead
+      max: 1, // Minimal pool size to reduce initialization overhead
+      min: 0, // Start with no connections
+      idleTimeoutMillis: 3000, // Very short idle timeout
+      connectionTimeoutMillis: 3000, // Very short connection timeout
+      allowExitOnIdle: true,
+      keepAlive: false, // Disable keep-alive to reduce overhead
     },
   }),
   collections: [
@@ -103,17 +103,23 @@ export default buildConfig({
   globals: [Header, Footer],
   plugins: [
     ...plugins,
-    // Always include Vercel Blob storage in the import map,
-    // but only make it functional in production
-    vercelBlobStorage({
-      token: process.env.BLOB_READ_WRITE_TOKEN || 'vercel_blob_rw_dummy_123456789',
-      collections: {
-        'media': {
-          // Only disable local storage in production
-          disableLocalStorage: process.env.NODE_ENV === 'production',
-        },
-      },
-    }),
+    // Only use Vercel Blob storage in production to avoid timeouts in development
+    ...(process.env.NODE_ENV === 'production'
+      ? [
+          vercelBlobStorage({
+            token: process.env.BLOB_READ_WRITE_TOKEN,
+            collections: {
+              'media': {
+                disableLocalStorage: true,
+                // Add this option to fix relationship issues
+                generateFileURL: ({ filename }) => {
+                  return `${process.env.NEXT_PUBLIC_SERVER_URL}/api/media/file/${filename}`;
+                },
+              },
+            },
+          }),
+        ]
+      : []),
   ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
