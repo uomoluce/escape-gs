@@ -75,6 +75,7 @@ export const ListItem: React.FC<ListItemProps> = ({
       if (isPlaying) {
         audioRef.current.pause()
         setIsPlaying(false)
+        onAudioToggle()
       } else {
         audioRef.current.play()
         setIsPlaying(true)
@@ -132,7 +133,7 @@ export const ListItem: React.FC<ListItemProps> = ({
           >
             {titleContent}
           </Link>
-          <ExternalLinkIcon />
+          {/* <ExternalLinkIcon /> */}
         </div>
       )
     }
@@ -211,7 +212,7 @@ export const ListItem: React.FC<ListItemProps> = ({
       {/* Render the hovering image at the document level to avoid containment issues */}
       {hasImage && showImage && (
         <div 
-          className="fixed z-50 shadow-lg overflow-hidden pointer-events-none"
+          className="fixed z-50 overflow-hidden pointer-events-none"
           style={{ 
             left: `${cursorPosition.x}px`, 
             top: `${cursorPosition.y}px`,
