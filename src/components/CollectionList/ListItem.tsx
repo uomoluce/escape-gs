@@ -24,48 +24,146 @@ export const ListItem: React.FC<ListItemProps> = ({
   const [duration, setDuration] = useState(0)
   const [showImage, setShowImage] = useState(false)
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 })
+  const [isDragging, setIsDragging] = useState(false)
   const audioRef = useRef<HTMLAudioElement>(null)
+  const progressBarRef = useRef<HTMLDivElement>(null)
   const gridTemplateColumns = columns.map((col) => col.width || '1fr').join(' ')
 
   const hasPlayableContent = item.audio?.mimeType === 'audio/mpeg'
   const hasExternalUrl = Boolean(item.url)
   const hasImage = Boolean(item.image?.url)
 
+  // Add a reset function to ensure consistent state when switching tracks
+  const resetPlayerState = (newTime = 0) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
+  };
+
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.addEventListener('timeupdate', updateTime)
+      
+      // Add a seeking event to update the UI immediately during seeking
+      audioRef.current.addEventListener('seeking', () => {
+        if (audioRef.current) {
+          setCurrentTime(audioRef.current.currentTime);
+        }
+      });
+      
       audioRef.current.addEventListener('loadedmetadata', () => {
         setDuration(audioRef.current?.duration || 0)
+        
+        // Reset UI immediately after metadata is loaded
+        if (audioRef.current) {
+          setCurrentTime(audioRef.current.currentTime);
+        }
+        
         if (isAudioVisible) {
-          audioRef.current?.play()
-          setIsPlaying(true)
+          const playPromise = audioRef.current?.play()
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                setIsPlaying(true)
+              })
+              .catch(error => {
+                console.error('Playback failed:', error)
+                setIsPlaying(false)
+              })
+          }
         }
       })
     }
     return () => {
       if (audioRef.current) {
         audioRef.current.removeEventListener('timeupdate', updateTime)
+        audioRef.current.removeEventListener('seeking', updateTime)
       }
     }
-  }, [isAudioVisible])
+  }, [isAudioVisible, item.audio?.url]); // Add item.audio?.url as dependency to refresh when track changes
 
   useEffect(() => {
-    if (!isAudioVisible && audioRef.current) {
-      audioRef.current.pause()
-      setIsPlaying(false)
+    // Immediately reset position display when audio becomes invisible
+    if (!isAudioVisible) {
+      resetPlayerState();
     }
-  }, [isAudioVisible])
+  }, [isAudioVisible]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDragging && progressBarRef.current && audioRef.current && duration) {
+        const rect = progressBarRef.current.getBoundingClientRect();
+        let position = (e.clientX - rect.left) / rect.width;
+        
+        // Clamp position between 0 and 1
+        position = Math.max(0, Math.min(1, position));
+        
+        const seekTime = position * duration;
+        audioRef.current.currentTime = seekTime;
+        setCurrentTime(seekTime);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      if (isPlaying && audioRef.current) {
+        audioRef.current.play();
+      }
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, duration, isPlaying]);
 
   const updateTime = () => {
     if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime)
+      // Force UI update with the current audio position
+      requestAnimationFrame(() => {
+        if (audioRef.current) {
+          setCurrentTime(audioRef.current.currentTime);
+        }
+      });
     }
-  }
+  };
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60)
     const seconds = Math.floor(time % 60)
     return `${minutes}:${seconds.toString().padStart(2, '0')}`
+  }
+
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!audioRef.current || !duration) return;
+    
+    const progressBar = e.currentTarget;
+    const rect = progressBar.getBoundingClientRect();
+    const position = (e.clientX - rect.left) / rect.width;
+    const seekTime = position * duration;
+    
+    audioRef.current.currentTime = seekTime;
+    setCurrentTime(seekTime);
+  }
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!audioRef.current || !duration) return;
+    
+    setIsDragging(true);
+    
+    // Pause audio during drag for better performance
+    if (isPlaying && audioRef.current) {
+      audioRef.current.pause();
+    }
+    
+    // Update position immediately on mouse down
+    handleSeek(e);
   }
 
   const handlePlayClick = () => {
@@ -77,8 +175,35 @@ export const ListItem: React.FC<ListItemProps> = ({
         setIsPlaying(false)
         onAudioToggle()
       } else {
-        audioRef.current.play()
-        setIsPlaying(true)
+        // Ensure we maintain the current position when resuming
+        const currentPosition = audioRef.current.currentTime
+        
+        // Show the player first, then play
+        if (!isAudioVisible) {
+          onAudioToggle()
+        }
+        
+        // Use a small timeout to ensure the DOM has updated
+        setTimeout(() => {
+          if (audioRef.current) {
+            // Ensure position is preserved
+            audioRef.current.currentTime = currentPosition
+            
+            const playPromise = audioRef.current.play()
+            
+            // Handle the play promise to avoid potential race conditions
+            if (playPromise !== undefined) {
+              playPromise
+                .then(() => {
+                  setIsPlaying(true)
+                })
+                .catch(error => {
+                  console.error('Playback error:', error)
+                  setIsPlaying(false)
+                })
+            }
+          }
+        }, 50)
       }
     } else {
       onAudioToggle()
@@ -172,21 +297,40 @@ export const ListItem: React.FC<ListItemProps> = ({
         style={{ gridTemplateColumns }}
       >
         <div></div>
-        <div className="col-span-full flex items-center">
-          <div className="flex-grow bg-border h-[2px]">
-            <div
-              className="bg-foreground h-full transition-all duration-100"
-              style={{ width: `${(currentTime / duration) * 100}%` }}
-            />
+        <div className="col-span-full">
+          <div className="flex items-center">
+            <div 
+              ref={progressBarRef}
+              className="flex-grow h-[2px] bg-border cursor-pointer relative group"
+              onClick={handleSeek}
+              onMouseDown={handleMouseDown}
+              aria-label="Audio progress"
+              aria-valuemin={0}
+              aria-valuemax={duration || 100}
+              aria-valuenow={currentTime}
+              aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
+            >
+              {/* Progress fill */}
+              <div
+                className="absolute top-0 left-0 bottom-0 bg-foreground group-hover:bg-primary transition-colors"
+                style={{ 
+                  width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
+                  transition: isDragging ? 'none' : 'width 0.1s linear'
+                }}
+              />
+            </div>
           </div>
+          
           <audio
             ref={audioRef}
             className="hidden"
             crossOrigin="anonymous"
             preload="metadata"
+            key={item.audio?.url}
             onEnded={() => {
-              setIsPlaying(false)
-              setCurrentTime(0)
+              setIsPlaying(false);
+              resetPlayerState(0);
+              onAudioToggle();
             }}
             onError={(e) => {
               console.error('Audio playback error:', e);
@@ -198,6 +342,22 @@ export const ListItem: React.FC<ListItemProps> = ({
       </div>
     )
   }
+
+  // Add helper function to get the thumbnail URL
+  const getThumbnailUrl = (image: any): string => {
+    // First check if the image has sizes.thumbnail (preferred)
+    if (image?.sizes?.thumbnail?.url) {
+      return image.sizes.thumbnail.url;
+    }
+    
+    // Some Payload configurations provide thumbnailURL directly
+    if (image?.thumbnailURL) {
+      return image.thumbnailURL;
+    }
+    
+    // Fallback to the original URL
+    return image.url;
+  };
 
   return (
     <div className="contents">
@@ -220,7 +380,7 @@ export const ListItem: React.FC<ListItemProps> = ({
           }}
         >
           <Image 
-            src={item.image.url} 
+            src={getThumbnailUrl(item.image)}
             alt={item.title || 'Event image'} 
             width={300}
             height={200}

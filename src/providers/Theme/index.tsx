@@ -47,6 +47,12 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       }
     }
 
+    // If there's no stored preference and we're on first load, force dark mode
+    if (!preference && !window.localStorage.getItem(themeLocalStorageKey)) {
+      themeToSet = 'dark'
+      window.localStorage.setItem(themeLocalStorageKey, themeToSet)
+    }
+
     document.documentElement.setAttribute('data-theme', themeToSet)
     setThemeState(themeToSet)
   }, [])
