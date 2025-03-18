@@ -8,39 +8,42 @@ export async function GET(
   const { filename } = await params;
   
   try {
-    // Get all blobs to search through them
-    // This works better for smaller blob stores (up to a few hundred files)
-    const { blobs } = await list();
+    // Use a more efficient approach with targeted searches instead of fetching all blobs
     
-    // Search for files that match or contain our filename
-    const matchingBlobs = blobs.filter(blob => {
-      const pathParts = blob.pathname.split('/');
-      const blobFilename = pathParts[pathParts.length - 1];
+    // 1. Try exact matches first with common patterns (most efficient)
+    const searchPatterns = [
+      `media/${filename}`,  // Standard media path
+      filename,             // Direct filename
+    ];
+    
+    // Try each pattern in order - return on first match
+    for (const pattern of searchPatterns) {
+      const { blobs } = await list({ prefix: pattern, limit: 1 });
+      if (blobs.length > 0 && blobs[0]) {
+        return NextResponse.redirect(blobs[0].url);
+      }
+    }
+    
+    // 2. If exact patterns fail, try a more flexible search but with limit
+    // Extract the base filename without extension for a broader search
+    const filenameParts = filename.split('.');
+    const baseFilename = filenameParts.length > 1 
+      ? filenameParts.slice(0, -1).join('.') 
+      : filename;
       
-      // Check if pathname ends with our filename
-      return blob.pathname.endsWith(`/${filename}`) || 
-             blob.pathname === filename ||
-             blobFilename === filename ||
-             blob.pathname === `media/${filename}`;
-    });
+    const { blobs } = await list({ prefix: baseFilename, limit: 10 });
     
-    // Sort matching blobs by most specific match first
-    const sortedBlobs = matchingBlobs.sort((a, b) => {
-      // Exact matches should come first
-      if (a.pathname === `media/${filename}` || a.pathname === filename) return -1;
-      if (b.pathname === `media/${filename}` || b.pathname === filename) return 1;
-      return 0;
-    });
-    
-    // Use the best match or fallback to any match
-    const blob = sortedBlobs[0];
+    // Find a close match if possible
+    const blob = blobs.find(b => 
+      b.pathname.includes(filename) || 
+      b.pathname.endsWith(`/${filename}`)
+    );
     
     if (blob) {
-      // If found, redirect to the Vercel Blob URL
       return NextResponse.redirect(blob.url);
     }
     
-    // If nothing found, return a 404
+    // If not found, return a 404
     return new NextResponse('File not found', { status: 404 });
   } catch (error) {
     console.error('Error serving file from Vercel Blob:', error);
