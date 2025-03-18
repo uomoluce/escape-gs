@@ -10,22 +10,25 @@ import { themeIsValid } from './types'
 
 const initialContext: ThemeContextType = {
   setTheme: () => null,
-  theme: undefined,
+  theme: defaultTheme,
 }
 
 const ThemeContext = createContext(initialContext)
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setThemeState] = useState<Theme | undefined>(
-    canUseDOM ? (document.documentElement.getAttribute('data-theme') as Theme) : undefined,
-  )
+  const [theme, setThemeState] = useState<Theme>(defaultTheme)
+  const [isMounted, setIsMounted] = useState(false)
 
+  // Safe theme setter that works on client side only
   const setTheme = useCallback((themeToSet: Theme | null) => {
+    if (!canUseDOM) return // Don't run on server
+
     if (themeToSet === null) {
       window.localStorage.removeItem(themeLocalStorageKey)
       const implicitPreference = getImplicitPreference()
-      document.documentElement.setAttribute('data-theme', implicitPreference || '')
+      document.documentElement.setAttribute('data-theme', implicitPreference || defaultTheme)
       if (implicitPreference) setThemeState(implicitPreference)
+      else setThemeState(defaultTheme)
     } else {
       setThemeState(themeToSet)
       window.localStorage.setItem(themeLocalStorageKey, themeToSet)
@@ -33,31 +36,32 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [])
 
+  // Handle initial theme setup (client-side only)
   useEffect(() => {
-    let themeToSet: Theme = defaultTheme
+    if (!canUseDOM) return
+    setIsMounted(true)
+
+    // Check for user's stored preference
     const preference = window.localStorage.getItem(themeLocalStorageKey)
-
+    
+    // If valid preference exists, use it
     if (themeIsValid(preference)) {
-      themeToSet = preference
-    } else {
-      const implicitPreference = getImplicitPreference()
-
-      if (implicitPreference) {
-        themeToSet = implicitPreference
-      }
+      setThemeState(preference)
+      document.documentElement.setAttribute('data-theme', preference)
+    } 
+    // Otherwise set the default theme (dark)
+    else {
+      setThemeState(defaultTheme)
+      window.localStorage.setItem(themeLocalStorageKey, defaultTheme)
+      document.documentElement.setAttribute('data-theme', defaultTheme)
     }
-
-    // If there's no stored preference and we're on first load, force dark mode
-    if (!preference && !window.localStorage.getItem(themeLocalStorageKey)) {
-      themeToSet = 'dark'
-      window.localStorage.setItem(themeLocalStorageKey, themeToSet)
-    }
-
-    document.documentElement.setAttribute('data-theme', themeToSet)
-    setThemeState(themeToSet)
   }, [])
 
-  return <ThemeContext.Provider value={{ setTheme, theme }}>{children}</ThemeContext.Provider>
+  return (
+    <ThemeContext.Provider value={{ setTheme, theme }}>
+      {children}
+    </ThemeContext.Provider>
+  )
 }
 
 export const useTheme = (): ThemeContextType => useContext(ThemeContext)

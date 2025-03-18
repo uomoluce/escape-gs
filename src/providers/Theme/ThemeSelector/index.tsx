@@ -1,38 +1,48 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import type { Theme } from './types'
 
 import { useTheme } from '..'
 import { themeLocalStorageKey } from './types'
-import { Button } from '@/components/ui/button'
 import { Moon, Sun } from 'lucide-react'
 
 export const ThemeSelector: React.FC = () => {
-  const { setTheme } = useTheme()
-  const [currentTheme, setCurrentTheme] = useState('light')
+  const { theme, setTheme } = useTheme()
+  const [isMounted, setIsMounted] = useState(false)
+  
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const toggleTheme = () => {
-    const newTheme: Theme = currentTheme === 'light' ? 'dark' : 'light'
-    setCurrentTheme(newTheme)
+    if (!isMounted) return
+    const newTheme: Theme = theme === 'light' ? 'dark' : 'light'
     setTheme(newTheme)
   }
 
-  React.useEffect(() => {
-    const preference = window.localStorage.getItem(themeLocalStorageKey) as Theme
-    setCurrentTheme(preference)
-  }, [])
+  // Use a simple placeholder during SSR
+  if (!isMounted) {
+    return (
+      <button
+        onClick={toggleTheme}
+        className="p-0 bg-transparent border-0 cursor-pointer"
+        aria-label="Toggle theme"
+      >
+        <div className="h-4 w-4" />
+      </button>
+    )
+  }
 
+  // Once mounted, show the actual button with current theme icon
   return (
-    <Button
-      variant="ghost"
-      size="icon"
+    <button
       onClick={toggleTheme}
-      className="w-9 h-9 bg-transparent"
-      aria-label={`Switch to ${currentTheme === 'light' ? 'dark' : 'light'} theme`}
+      className="p-0 bg-transparent border-0 cursor-pointer"
+      aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
     >
-      {currentTheme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-    </Button>
+      {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+    </button>
   )
 }

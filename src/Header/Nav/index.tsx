@@ -1,18 +1,27 @@
 'use client'
 
 import React from 'react'
-
 import type { Header as HeaderType } from '@/payload-types'
-
-import { CMSLink } from '@/components/Link'
+import Link from 'next/link'
 
 export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
   const navItems = data?.navItems || []
 
   return (
-    <nav className="flex gap-3 items-center">
+    <nav className="flex gap-5 items-center">
       {navItems.map(({ link }, i) => {
-        return <CMSLink key={i} {...link} appearance="link" className="text-foreground dark:text-primary text-base font-normal" />
+        if (!link?.url) return null;
+        
+        return (
+          <Link 
+            key={i}
+            href={link.url} 
+            target={link.newTab ? '_blank' : undefined}
+            className="nav-link hover:opacity-75 transition-opacity"
+          >
+            {link.label}
+          </Link>
+        )
       })}
     </nav>
   )

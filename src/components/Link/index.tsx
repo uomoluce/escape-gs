@@ -55,6 +55,18 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
     )
   }
 
+  // For 'link' appearance, explicitly add text color classes to ensure visibility in both modes
+  if (appearance === 'link') {
+    return (
+      <Button asChild className={cn('text-foreground dark:text-primary', className)} size={size} variant={appearance}>
+        <Link href={href || url || ''} {...newTabProps}>
+          {label && label}
+          {children && children}
+        </Link>
+      </Button>
+    )
+  }
+
   return (
     <Button asChild className={className} size={size} variant={appearance}>
       <Link className={cn(className)} href={href || url || ''} {...newTabProps}>

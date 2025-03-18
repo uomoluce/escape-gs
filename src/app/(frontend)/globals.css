@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
 
 @font-face {
   font-family: 'Atlas Grotesk';
@@ -11,7 +11,7 @@
   font-weight: 400;
   font-style: normal;
   font-display: swap;
-}
+} */
 
 @layer base {
   h1,
@@ -65,7 +65,8 @@
     --error: 10 100% 86%;
 
     --font-sans: Arial, 'Atlas Grotesk', system-ui, sans-serif;
-    --font-size-base: 14px;
+    --font-serif: 'Times', 'Times New Roman', serif;
+    --font-size-base: 16px;
     --line-height-base: 1.5;
     --letter-spacing: 0.02em;
   }
@@ -112,23 +113,28 @@
   html,
   body {
     @apply bg-background text-foreground min-h-[100vh] flex flex-col;
-    font-family: var(--font-sans);
+    font-family: var(--font-serif);
     font-size: var(--font-size-base);
     line-height: var(--line-height-base);
     letter-spacing: var(--letter-spacing);
-    -webkit-font-smoothing: antialiased;
+    font-weight: normal;
   }
 
   a {
     @apply text-foreground no-underline hover:opacity-75 transition-opacity;
   }
 
-  /* nav a {
-    @apply text-foreground;
-  } */
+  /* Simple, direct styling for navigation links */
+  .nav-link {
+    color: black; /* Default color for light mode */
+  }
+
+  [data-theme='dark'] .nav-link {
+    color: white; /* Color for dark mode */
+  }
 
   button {
-    font-family: var(--font-sans);
+    font-family: var(--font-serif);
     @apply bg-transparent border-0 cursor-pointer text-inherit p-0;
   }
 }

@@ -271,13 +271,13 @@ export const ListItem: React.FC<ListItemProps> = ({
 
     if (isAudioVisible && isPlaying) {
       return (
-        <div className="text-sm text-right tabular-nums">
+        <div className="text-right tabular-nums">
           {formatTime(currentTime)} / {formatTime(duration)}
         </div>
       )
     }
 
-    return <div className="text-sm tabular-nums text-right">{formatTime(duration)}</div>
+    return <div className="tabular-nums text-right">{formatTime(duration)}</div>
   }
 
   const renderCell = (field: string) => {
