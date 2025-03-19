@@ -15,20 +15,15 @@
 
 @layer components {
   .container {
-    width: 95%;
+    width: 95% !important;
     margin-left: auto;
     margin-right: auto;
   }
 
-  @media (min-width: 1280px) {
-    .container {
-      width: 80rem;
-    }
-  }
-
+  /* Switch to fixed width only at 2xl */
   @media (min-width: 1536px) {
     .container {
-      width: 86rem;
+      width: 86rem !important;
     }
   }
 }

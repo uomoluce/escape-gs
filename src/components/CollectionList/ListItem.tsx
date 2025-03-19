@@ -334,8 +334,11 @@ export const ListItem: React.FC<ListItemProps> = ({
   return (
     <div className="contents">
       <div className="grid gap-x-4 items-start w-full" style={{ gridTemplateColumns }}>
-        {columns.map(({ field }) => (
-          <div key={field} className={field.toLowerCase()}>
+        {columns.map(({ field }, index) => (
+          <div
+            key={field}
+            className={`${field.toLowerCase()} ${index === columns.length - 1 ? 'text-right' : ''}`}
+          >
             {renderCell(field)}
           </div>
         ))}

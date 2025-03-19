@@ -17,7 +17,11 @@ export default async function Page() {
     },
   })
 
-  const columns = [{ field: 'date', width: '200px' }, { field: 'entity' }, { field: 'role' }]
+  const columns = [
+    { field: 'date', width: '200px' },
+    { field: 'entity', width: 'minmax(250px, 2fr)' },
+    { field: 'role', width: 'minmax(120px, 1fr)' },
+  ]
 
   // Map items to include required title field
   const items: Item[] = curatorship?.docs.map(({ id, date, entity, role, url }) => ({

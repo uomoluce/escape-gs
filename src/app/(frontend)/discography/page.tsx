@@ -23,9 +23,9 @@ export default async function Page() {
   const columns = [
     { field: 'year', width: '60px' },
     { field: 'play', width: '100px' },
-    { field: 'title' },
-    { field: 'label' },
-    { field: 'type' },
+    { field: 'title', width: 'minmax(250px, 2fr)' },
+    { field: 'label', width: 'minmax(120px, 1fr)' },
+    { field: 'type', width: 'minmax(100px, 1fr)' },
   ]
 
   // Convert id to string and handle null values
