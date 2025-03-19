@@ -8,7 +8,6 @@ export const Discography: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
-    group: 'Site Pages',
   },
   access: {
     read: () => true,

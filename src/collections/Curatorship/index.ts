@@ -8,7 +8,6 @@ export const Curatorship: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'entity',
-    group: 'Site Pages',
   },
   access: {
     read: () => true,

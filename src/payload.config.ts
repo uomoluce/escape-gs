@@ -5,7 +5,7 @@ import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 
 import sharp from 'sharp' // sharp-import
 import path from 'path'
-import { buildConfig, PayloadRequest } from 'payload'
+import { buildConfig, PayloadRequest, CollectionConfig } from 'payload'
 import { fileURLToPath } from 'url'
 
 import { Categories } from './collections/Categories'
@@ -27,6 +27,15 @@ import { SoundDesign } from './collections/SoundDesign'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+
+// Helper to hide a collection
+const hideCollection = (collection: CollectionConfig): CollectionConfig => ({
+  ...collection,
+  admin: {
+    ...collection.admin,
+    hidden: true,
+  },
+})
 
 export default buildConfig({
   admin: {
@@ -75,9 +84,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
       // SSL configuration - only enable in production
-      ssl: process.env.NODE_ENV === 'production'
-        ? { rejectUnauthorized: false }
-        : false,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
       // Connection pool settings optimized for migrations and serverless
       max: 3, // Allow more connections for migrations
       min: 0, // Start with no connections
@@ -88,7 +95,7 @@ export default buildConfig({
     },
   }),
   collections: [
-    Pages,
+    hideCollection(Pages),
     Posts,
     Media,
     Categories,
@@ -115,7 +122,7 @@ export default buildConfig({
           // Configure URL generation to use our custom API route
           generateFileURL: ({ filename }: { filename: string }) => {
             // Use the custom API route to handle file serving
-            return `${process.env.NEXT_PUBLIC_SERVER_URL}/api/media/file/${filename}`;
+            return `${process.env.NEXT_PUBLIC_SERVER_URL}/api/media/file/${filename}`
           },
         },
       },

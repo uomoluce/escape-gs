@@ -31,7 +31,7 @@ export const Posts: CollectionConfig<'posts'> = {
   slug: 'posts',
   labels: {
     singular: 'Post',
-    plural: 'Posts/Desk',
+    plural: 'Posts',
   },
   access: {
     create: authenticated,

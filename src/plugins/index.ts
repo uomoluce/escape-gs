@@ -45,6 +45,9 @@ export const plugins: Plugin[] = [
       hooks: {
         afterChange: [revalidateRedirects],
       },
+      admin: {
+        hidden: true,
+      },
     },
   }),
   nestedDocsPlugin({
@@ -79,6 +82,14 @@ export const plugins: Plugin[] = [
           return field
         })
       },
+      admin: {
+        hidden: true,
+      },
+    },
+    formSubmissionOverrides: {
+      admin: {
+        hidden: true,
+      },
     },
   }),
   searchPlugin({
@@ -87,6 +98,9 @@ export const plugins: Plugin[] = [
     searchOverrides: {
       fields: ({ defaultFields }) => {
         return [...defaultFields, ...searchFields]
+      },
+      admin: {
+        hidden: true,
       },
     },
   }),
