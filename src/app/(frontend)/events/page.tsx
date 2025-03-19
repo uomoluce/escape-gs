@@ -16,6 +16,7 @@ export default async function Page() {
       location: true,
       url: true,
       audio: true,
+      soundcloudEmbed: true,
       image: {
         url: true,
         sizes: {
@@ -67,7 +68,7 @@ export default async function Page() {
       url: item.url || undefined,
       audio,
       image,
-      soundcloudEmbed: undefined,
+      soundcloudEmbed: item.soundcloudEmbed || undefined,
     }
   })
 

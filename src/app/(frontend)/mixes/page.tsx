@@ -16,6 +16,7 @@ export default async function Page() {
       platform: true,
       url: true,
       audio: true,
+      soundcloudEmbed: true,
     },
   })
 
@@ -45,7 +46,7 @@ export default async function Page() {
       platform: item.platform,
       url: item.url || undefined,
       audio,
-      soundcloudEmbed: undefined, // Explicitly set to undefined since we're not querying it
+      soundcloudEmbed: item.soundcloudEmbed || undefined,
     }
   })
 
