@@ -36,30 +36,30 @@ export const ListItem: React.FC<ListItemProps> = ({
   // Add a reset function to ensure consistent state when switching tracks
   const resetPlayerState = (newTime = 0) => {
     if (audioRef.current) {
-      audioRef.current.currentTime = newTime;
-      setCurrentTime(newTime);
+      audioRef.current.currentTime = newTime
+      setCurrentTime(newTime)
     }
-  };
+  }
 
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.addEventListener('timeupdate', updateTime)
-      
+
       // Add a seeking event to update the UI immediately during seeking
       audioRef.current.addEventListener('seeking', () => {
         if (audioRef.current) {
-          setCurrentTime(audioRef.current.currentTime);
+          setCurrentTime(audioRef.current.currentTime)
         }
-      });
-      
+      })
+
       audioRef.current.addEventListener('loadedmetadata', () => {
         setDuration(audioRef.current?.duration || 0)
-        
+
         // Reset UI immediately after metadata is loaded
         if (audioRef.current) {
-          setCurrentTime(audioRef.current.currentTime);
+          setCurrentTime(audioRef.current.currentTime)
         }
-        
+
         if (isAudioVisible) {
           const playPromise = audioRef.current?.play()
           if (playPromise !== undefined) {
@@ -67,7 +67,7 @@ export const ListItem: React.FC<ListItemProps> = ({
               .then(() => {
                 setIsPlaying(true)
               })
-              .catch(error => {
+              .catch((error) => {
                 console.error('Playback failed:', error)
                 setIsPlaying(false)
               })
@@ -81,58 +81,58 @@ export const ListItem: React.FC<ListItemProps> = ({
         audioRef.current.removeEventListener('seeking', updateTime)
       }
     }
-  }, [isAudioVisible, item.audio?.url]); // Add item.audio?.url as dependency to refresh when track changes
+  }, [isAudioVisible, item.audio?.url]) // Add item.audio?.url as dependency to refresh when track changes
 
   useEffect(() => {
     // Immediately reset position display when audio becomes invisible
     if (!isAudioVisible) {
-      resetPlayerState();
+      resetPlayerState()
     }
-  }, [isAudioVisible]);
+  }, [isAudioVisible])
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isDragging && progressBarRef.current && audioRef.current && duration) {
-        const rect = progressBarRef.current.getBoundingClientRect();
-        let position = (e.clientX - rect.left) / rect.width;
-        
+        const rect = progressBarRef.current.getBoundingClientRect()
+        let position = (e.clientX - rect.left) / rect.width
+
         // Clamp position between 0 and 1
-        position = Math.max(0, Math.min(1, position));
-        
-        const seekTime = position * duration;
-        audioRef.current.currentTime = seekTime;
-        setCurrentTime(seekTime);
+        position = Math.max(0, Math.min(1, position))
+
+        const seekTime = position * duration
+        audioRef.current.currentTime = seekTime
+        setCurrentTime(seekTime)
       }
-    };
+    }
 
     const handleMouseUp = () => {
-      setIsDragging(false);
+      setIsDragging(false)
       if (isPlaying && audioRef.current) {
-        audioRef.current.play();
+        audioRef.current.play()
       }
-    };
+    }
 
     if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
     }
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, duration, isPlaying]);
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isDragging, duration, isPlaying])
 
   const updateTime = () => {
     if (audioRef.current) {
       // Force UI update with the current audio position
       requestAnimationFrame(() => {
         if (audioRef.current) {
-          setCurrentTime(audioRef.current.currentTime);
+          setCurrentTime(audioRef.current.currentTime)
         }
-      });
+      })
     }
-  };
+  }
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60)
@@ -141,29 +141,29 @@ export const ListItem: React.FC<ListItemProps> = ({
   }
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current || !duration) return;
-    
-    const progressBar = e.currentTarget;
-    const rect = progressBar.getBoundingClientRect();
-    const position = (e.clientX - rect.left) / rect.width;
-    const seekTime = position * duration;
-    
-    audioRef.current.currentTime = seekTime;
-    setCurrentTime(seekTime);
+    if (!audioRef.current || !duration) return
+
+    const progressBar = e.currentTarget
+    const rect = progressBar.getBoundingClientRect()
+    const position = (e.clientX - rect.left) / rect.width
+    const seekTime = position * duration
+
+    audioRef.current.currentTime = seekTime
+    setCurrentTime(seekTime)
   }
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current || !duration) return;
-    
-    setIsDragging(true);
-    
+    if (!audioRef.current || !duration) return
+
+    setIsDragging(true)
+
     // Pause audio during drag for better performance
     if (isPlaying && audioRef.current) {
-      audioRef.current.pause();
+      audioRef.current.pause()
     }
-    
+
     // Update position immediately on mouse down
-    handleSeek(e);
+    handleSeek(e)
   }
 
   const handlePlayClick = () => {
@@ -177,27 +177,27 @@ export const ListItem: React.FC<ListItemProps> = ({
       } else {
         // Ensure we maintain the current position when resuming
         const currentPosition = audioRef.current.currentTime
-        
+
         // Show the player first, then play
         if (!isAudioVisible) {
           onAudioToggle()
         }
-        
+
         // Use a small timeout to ensure the DOM has updated
         setTimeout(() => {
           if (audioRef.current) {
             // Ensure position is preserved
             audioRef.current.currentTime = currentPosition
-            
+
             const playPromise = audioRef.current.play()
-            
+
             // Handle the play promise to avoid potential race conditions
             if (playPromise !== undefined) {
               playPromise
                 .then(() => {
                   setIsPlaying(true)
                 })
-                .catch(error => {
+                .catch((error) => {
                   console.error('Playback error:', error)
                   setIsPlaying(false)
                 })
@@ -213,9 +213,9 @@ export const ListItem: React.FC<ListItemProps> = ({
   const handleMouseMove = (e: React.MouseEvent) => {
     if (hasImage) {
       // Calculate position with offset to prevent image from being under cursor
-      setCursorPosition({ 
-        x: e.clientX + 20, 
-        y: e.clientY + 20 
+      setCursorPosition({
+        x: e.clientX + 20,
+        y: e.clientY + 20,
       })
     }
   }
@@ -235,7 +235,7 @@ export const ListItem: React.FC<ListItemProps> = ({
 
   const renderTitle = () => {
     const titleContent = (
-      <span 
+      <span
         className={`${hasExternalUrl ? 'hover:opacity-75 transition-opacity' : ''} ${hasImage ? 'relative' : ''}`}
         onMouseEnter={() => hasImage && setShowImage(true)}
         onMouseLeave={() => hasImage && setShowImage(false)}
@@ -248,9 +248,9 @@ export const ListItem: React.FC<ListItemProps> = ({
     if (hasExternalUrl) {
       return (
         <div className="flex items-center gap-2">
-          <Link 
-            href={item.url} 
-            target="_blank" 
+          <Link
+            href={item.url}
+            target="_blank"
             className="hover:opacity-75"
             onMouseEnter={() => hasImage && setShowImage(true)}
             onMouseLeave={() => hasImage && setShowImage(false)}
@@ -289,8 +289,8 @@ export const ListItem: React.FC<ListItemProps> = ({
 
   const renderAudioPlayer = () => {
     // Use audio URL directly
-    const audioUrl = item.audio?.url || '';
-    
+    const audioUrl = item.audio?.url || ''
+
     return (
       <div
         className="grid gap-y-2 w-[calc(100%-76px)] ml-[76px] mb-4"
@@ -299,7 +299,7 @@ export const ListItem: React.FC<ListItemProps> = ({
         <div></div>
         <div className="col-span-full">
           <div className="flex items-center">
-            <div 
+            <div
               ref={progressBarRef}
               className="flex-grow h-[2px] bg-border cursor-pointer relative group"
               onClick={handleSeek}
@@ -313,14 +313,14 @@ export const ListItem: React.FC<ListItemProps> = ({
               {/* Progress fill */}
               <div
                 className="absolute top-0 left-0 bottom-0 bg-foreground group-hover:bg-primary transition-colors"
-                style={{ 
+                style={{
                   width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
-                  transition: isDragging ? 'none' : 'width 0.1s linear'
+                  transition: isDragging ? 'none' : 'width 0.1s linear',
                 }}
               />
             </div>
           </div>
-          
+
           <audio
             ref={audioRef}
             className="hidden"
@@ -328,12 +328,12 @@ export const ListItem: React.FC<ListItemProps> = ({
             preload="metadata"
             key={item.audio?.url}
             onEnded={() => {
-              setIsPlaying(false);
-              resetPlayerState(0);
-              onAudioToggle();
+              setIsPlaying(false)
+              resetPlayerState(0)
+              onAudioToggle()
             }}
             onError={(e) => {
-              console.error('Audio playback error:', e);
+              console.error('Audio playback error:', e)
             }}
           >
             <source src={audioUrl} type={item.audio?.mimeType || 'audio/mpeg'} />
@@ -347,17 +347,17 @@ export const ListItem: React.FC<ListItemProps> = ({
   const getThumbnailUrl = (image: any): string => {
     // First check if the image has sizes.thumbnail (preferred)
     if (image?.sizes?.thumbnail?.url) {
-      return image.sizes.thumbnail.url;
+      return image.sizes.thumbnail.url
     }
-    
+
     // Some Payload configurations provide thumbnailURL directly
     if (image?.thumbnailURL) {
-      return image.thumbnailURL;
+      return image.thumbnailURL
     }
-    
+
     // Fallback to the original URL
-    return image.url;
-  };
+    return image.url
+  }
 
   return (
     <div className="contents">
@@ -371,23 +371,28 @@ export const ListItem: React.FC<ListItemProps> = ({
       {hasPlayableContent && isAudioVisible && renderAudioPlayer()}
       {/* Render the hovering image at the document level to avoid containment issues */}
       {hasImage && showImage && (
-        <div 
+        <div
           className="fixed z-50 overflow-hidden pointer-events-none"
-          style={{ 
-            left: `${cursorPosition.x}px`, 
+          style={{
+            left: `${cursorPosition.x}px`,
             top: `${cursorPosition.y}px`,
-            transition: 'left 0.05s, top 0.05s'
+            transition: 'left 0.05s, top 0.05s',
           }}
         >
-          <Image 
+          <Image
             src={getThumbnailUrl(item.image)}
-            alt={item.title || 'Event image'} 
+            alt={item.title || 'Event image'}
             width={300}
             height={200}
             className="object-contain max-w-[300px] max-h-[200px] w-auto h-auto"
-            style={{ 
-              width: 'auto', 
-              height: 'auto'
+            style={{
+              width: 'auto',
+              height: 'auto',
+            }}
+            onError={() => {
+              setShowImage(false)
+              // Update hasImage to prevent future attempts
+              item.image = null
             }}
           />
         </div>
