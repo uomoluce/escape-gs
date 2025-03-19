@@ -1,17 +1,12 @@
+// This remains a server component
 import React from 'react'
-import { ListWrapper } from './ListWrapper'
-
-interface Column {
-  field: string
-  width?: string
-}
+import { ListItems } from './ListItems'
+import type { Column, CollectionType, Item } from './types'
 
 interface Props {
-  title?: string
-  items: any[]
+  items: Item[]
   columns: Column[]
-  collectionType?: 'discography' | 'events' | 'curatorship' | 'mixes' | 'sound-design' | 'default'
-  sortBy?: string
+  collectionType?: CollectionType
 }
 
 /**
@@ -23,34 +18,22 @@ interface Props {
  *  - sound design
  * Designed to look like a table, but really a list of items wrapped in a css grid
  */
-export const CollectionList: React.FC<Props> = ({
+export const CollectionList = ({
   items,
-  columns,
+  columns: initialColumns,
   collectionType = 'default',
-  sortBy = 'date',
-}) => {
-  // Sort items by date in descending order (newest first)
-  const sortedItems = [...items].sort((a, b) => {
-    const aValue = a[sortBy] || a.year || a.createdAt
-    const bValue = b[sortBy] || b.year || b.createdAt
+}: Props) => {
+  // Do the audio check on the server
+  const hasAudioContent = items.some((item) => item.audio?.mimeType === 'audio/mpeg')
 
-    if (!aValue) return 1
-    if (!bValue) return -1
-
-    const aDate = typeof aValue === 'string' ? new Date(aValue) : aValue
-    const bDate = typeof bValue === 'string' ? new Date(bValue) : bValue
-
-    // Always sort in descending order (newest first)
-    return bDate < aDate ? -1 : bDate > aDate ? 1 : 0
-  })
+  // Filter columns on the server
+  const columns = hasAudioContent
+    ? initialColumns
+    : initialColumns.filter((col) => col.field !== 'play' && col.field !== 'duration')
 
   return (
-    <div className="container mb-16">
-      <div className="collection-list">
-        <div className="collection-list__items w-full">
-          <ListWrapper items={sortedItems} columns={columns} collectionType={collectionType} />
-        </div>
-      </div>
+    <div className="container">
+      <ListItems items={items} columns={columns} collectionType={collectionType} />
     </div>
   )
 }

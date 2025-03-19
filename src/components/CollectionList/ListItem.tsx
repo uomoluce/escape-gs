@@ -3,14 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-
-interface ListItemProps {
-  item: any
-  columns: Array<{ field: string; width?: string }>
-  collectionType?: 'discography' | 'events' | 'curatorship' | 'mixes' | 'sound-design' | 'default'
-  isAudioVisible: boolean
-  onAudioToggle: () => void
-}
+import type { ListItemProps } from './types'
 
 export const ListItem: React.FC<ListItemProps> = ({
   item,
