@@ -8,7 +8,7 @@ export async function getPayloadData<T extends CollectionSlug>(collection: T, op
   return payload.find({
     collection,
     depth: 1,
-    limit: 12,
+    pagination: false,
     overrideAccess: false,
     ...options,
   })
