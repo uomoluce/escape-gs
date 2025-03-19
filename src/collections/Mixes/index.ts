@@ -1,4 +1,5 @@
 import { CollectionConfig } from 'payload'
+import { soundcloudEmbed } from '@/fields/soundcloud'
 
 export const Mixes: CollectionConfig = {
   slug: 'mixes',
@@ -37,5 +38,6 @@ export const Mixes: CollectionConfig = {
       type: 'upload',
       relationTo: 'media',
     },
+    soundcloudEmbed,
   ],
 }

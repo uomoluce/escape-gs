@@ -1,4 +1,5 @@
 import { CollectionConfig } from 'payload'
+import { soundcloudEmbed } from '@/fields/soundcloud'
 
 export const Discography: CollectionConfig = {
   slug: 'discography',
@@ -54,5 +55,6 @@ export const Discography: CollectionConfig = {
         description: 'Upload an audio file (MP3)',
       },
     },
+    soundcloudEmbed,
   ],
 }

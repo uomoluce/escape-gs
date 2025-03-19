@@ -24,7 +24,9 @@ export const CollectionList = ({
   collectionType = 'default',
 }: Props) => {
   // Do the audio check on the server
-  const hasAudioContent = items.some((item) => item.audio?.mimeType === 'audio/mpeg')
+  const hasAudioContent = items.some(
+    (item) => item.audio?.mimeType === 'audio/mpeg' || Boolean(item.soundcloudEmbed),
+  )
 
   // Filter columns on the server
   const columns = hasAudioContent

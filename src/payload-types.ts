@@ -756,6 +756,10 @@ export interface Discography {
    * Upload an audio file (MP3)
    */
   audio?: (number | null) | Media;
+  /**
+   * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
+   */
+  soundcloudEmbed?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -770,6 +774,10 @@ export interface Mix {
   platform: string;
   url?: string | null;
   audio?: (number | null) | Media;
+  /**
+   * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
+   */
+  soundcloudEmbed?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -784,6 +792,10 @@ export interface Event {
   location: string;
   url?: string | null;
   audio?: (number | null) | Media;
+  /**
+   * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
+   */
+  soundcloudEmbed?: string | null;
   image?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
@@ -825,6 +837,10 @@ export interface SoundDesign {
   platform: string;
   url?: string | null;
   audio?: (number | null) | Media;
+  /**
+   * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
+   */
+  soundcloudEmbed?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1408,6 +1424,7 @@ export interface DiscographySelect<T extends boolean = true> {
   type?: T;
   url?: T;
   audio?: T;
+  soundcloudEmbed?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1421,6 +1438,7 @@ export interface MixesSelect<T extends boolean = true> {
   platform?: T;
   url?: T;
   audio?: T;
+  soundcloudEmbed?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1434,6 +1452,7 @@ export interface EventsSelect<T extends boolean = true> {
   location?: T;
   url?: T;
   audio?: T;
+  soundcloudEmbed?: T;
   image?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1461,6 +1480,7 @@ export interface SoundDesignSelect<T extends boolean = true> {
   platform?: T;
   url?: T;
   audio?: T;
+  soundcloudEmbed?: T;
   updatedAt?: T;
   createdAt?: T;
 }

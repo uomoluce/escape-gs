@@ -17,6 +17,7 @@ export interface Item {
   date?: string
   duration?: string
   url?: string
+  soundcloudEmbed?: string
   audio?: {
     url: string
     mimeType: string
@@ -29,7 +30,8 @@ export interface Item {
       }
     }
     thumbnailURL?: string
-  }
+  } | null
+  [key: string]: any // Add index signature to allow string indexing
 }
 
 export interface ListItemProps {

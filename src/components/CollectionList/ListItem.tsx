@@ -22,7 +22,7 @@ export const ListItem: React.FC<ListItemProps> = ({
   const progressBarRef = useRef<HTMLDivElement>(null)
   const gridTemplateColumns = columns.map((col) => col.width || '1fr').join(' ')
 
-  const hasPlayableContent = item.audio?.mimeType === 'audio/mpeg'
+  const hasPlayableContent = item.audio?.mimeType === 'audio/mpeg' || Boolean(item.soundcloudEmbed)
   const hasExternalUrl = Boolean(item.url)
   const hasImage = Boolean(item.image?.url)
 
@@ -162,42 +162,12 @@ export const ListItem: React.FC<ListItemProps> = ({
   const handlePlayClick = () => {
     if (!hasPlayableContent) return
 
-    if (isAudioVisible && audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause()
+    if (isAudioVisible) {
+      if (item.audio?.mimeType === 'audio/mpeg' && isPlaying) {
+        audioRef.current?.pause()
         setIsPlaying(false)
-        onAudioToggle()
-      } else {
-        // Ensure we maintain the current position when resuming
-        const currentPosition = audioRef.current.currentTime
-
-        // Show the player first, then play
-        if (!isAudioVisible) {
-          onAudioToggle()
-        }
-
-        // Use a small timeout to ensure the DOM has updated
-        setTimeout(() => {
-          if (audioRef.current) {
-            // Ensure position is preserved
-            audioRef.current.currentTime = currentPosition
-
-            const playPromise = audioRef.current.play()
-
-            // Handle the play promise to avoid potential race conditions
-            if (playPromise !== undefined) {
-              playPromise
-                .then(() => {
-                  setIsPlaying(true)
-                })
-                .catch((error) => {
-                  console.error('Playback error:', error)
-                  setIsPlaying(false)
-                })
-            }
-          }
-        }, 50)
       }
+      onAudioToggle()
     } else {
       onAudioToggle()
     }
@@ -221,7 +191,7 @@ export const ListItem: React.FC<ListItemProps> = ({
         onClick={handlePlayClick}
         className="inline-flex items-center hover:opacity-75 transition-opacity"
       >
-        {isPlaying && isAudioVisible ? 'PAUSE' : 'PLAY'}
+        {isPlaying && isAudioVisible && item.audio?.mimeType === 'audio/mpeg' ? 'PAUSE' : 'PLAY'}
       </button>
     )
   }
@@ -242,7 +212,7 @@ export const ListItem: React.FC<ListItemProps> = ({
       return (
         <div className="flex items-center gap-2">
           <Link
-            href={item.url}
+            href={item.url || '#'}
             target="_blank"
             className="hover:opacity-75"
             onMouseEnter={() => hasImage && setShowImage(true)}
@@ -281,6 +251,15 @@ export const ListItem: React.FC<ListItemProps> = ({
   }
 
   const renderAudioPlayer = () => {
+    if (item.soundcloudEmbed) {
+      return (
+        <div
+          className="w-[calc(100%-76px)] ml-[76px] my-4"
+          dangerouslySetInnerHTML={{ __html: item.soundcloudEmbed }}
+        />
+      )
+    }
+
     // Use audio URL directly
     const audioUrl = item.audio?.url || ''
 
