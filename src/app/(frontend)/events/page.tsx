@@ -26,6 +26,7 @@ export default async function Page() {
         },
       },
     },
+    sort: '-year',
   })
 
   const columns = [

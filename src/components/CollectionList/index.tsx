@@ -34,7 +34,7 @@ export const CollectionList = ({
     : initialColumns.filter((col) => col.field !== 'play' && col.field !== 'duration')
 
   return (
-    <div className="container">
+    <div className="container mb-20">
       <ListItems items={items} columns={columns} collectionType={collectionType} />
     </div>
   )

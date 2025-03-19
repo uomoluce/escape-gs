@@ -18,6 +18,7 @@ export default async function Page() {
       audio: true,
       soundcloudEmbed: true,
     },
+    sort: '-year', // Sort by year in descending order
   })
 
   const columns = [

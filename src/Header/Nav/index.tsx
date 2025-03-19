@@ -8,14 +8,14 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
   const navItems = data?.navItems || []
 
   return (
-    <nav className="flex gap-5 items-center">
+    <nav className="flex gap-5 items-start">
       {navItems.map(({ link }, i) => {
-        if (!link?.url) return null;
-        
+        if (!link?.url) return null
+
         return (
-          <Link 
+          <Link
             key={i}
-            href={link.url} 
+            href={link.url}
             target={link.newTab ? '_blank' : undefined}
             className="nav-link hover:opacity-75 transition-opacity"
           >

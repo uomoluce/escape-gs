@@ -17,6 +17,7 @@ export default async function Page() {
       audio: true,
       soundcloudEmbed: true,
     },
+    sort: '-year',
   })
 
   const columns = [
