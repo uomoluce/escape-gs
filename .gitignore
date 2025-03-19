@@ -12,3 +12,6 @@ public/media/
 
 public/robots.txt
 public/sitemap*.xml
+
+# Backup migrations
+src/migrations/backup/

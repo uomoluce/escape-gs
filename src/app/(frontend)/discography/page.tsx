@@ -13,10 +13,8 @@ export default async function Page() {
       year: true,
       label: true,
       type: true,
-      duration: true,
       url: true,
       audio: true,
-      soundcloudEmbed: true,
     },
   })
 
@@ -26,7 +24,6 @@ export default async function Page() {
     { field: 'title' },
     { field: 'label' },
     { field: 'type' },
-    // { field: 'duration', width: '150px' },
   ]
 
   // Convert id to string and handle null values
@@ -41,11 +38,14 @@ export default async function Page() {
         : undefined
 
     return {
-      ...item,
       id: String(item.id),
+      title: item.title,
+      year: item.year,
+      label: item.label,
+      type: item.type,
       url: item.url || undefined,
       audio,
-      soundcloudEmbed: item.soundcloudEmbed || undefined,
+      soundcloudEmbed: undefined, // Explicitly set to undefined since we're not querying it
     }
   })
 

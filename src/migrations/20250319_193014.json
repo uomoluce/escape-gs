@@ -1,5 +1,5 @@
 {
-  "id": "9b785ba3-0fd3-4daa-9228-3bd90887f628",
+  "id": "91929783-4ffe-4899-9459-de16b8348439",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -5017,6 +5017,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "soundcloud_embed": {
+          "name": "soundcloud_embed",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp(3) with time zone",
@@ -5140,6 +5146,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "soundcloud_embed": {
+          "name": "soundcloud_embed",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp(3) with time zone",
@@ -5260,6 +5272,12 @@
         "audio_id": {
           "name": "audio_id",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "soundcloud_embed": {
+          "name": "soundcloud_embed",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": false
         },
@@ -5540,6 +5558,12 @@
         "audio_id": {
           "name": "audio_id",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "soundcloud_embed": {
+          "name": "soundcloud_embed",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": false
         },
