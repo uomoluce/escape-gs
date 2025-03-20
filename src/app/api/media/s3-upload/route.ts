@@ -1,6 +1,6 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 // Configure Edge runtime for better performance
 export const runtime = 'edge'
@@ -10,46 +10,60 @@ export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
 export const revalidate = 0
 
-// Initialize S3 client
+interface UploadRequestBody {
+  filename: string
+  contentType: string
+}
+
+// Initialize S3 client with environment variables
 const s3 = new S3Client({
-  region: process.env.S3_REGION || '',
+  region: process.env.S3_REGION,
   credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+    accessKeyId: process.env.S3_ACCESS_KEY_ID ?? '',
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? '',
   },
   forcePathStyle: true,
 })
 
-export async function POST(request: Request): Promise<NextResponse> {
-  console.log('S3 upload request received')
-
+export async function POST(request: NextRequest) {
   try {
-    const { filename, contentType } = await request.json()
-    console.log('Processing S3 upload request:', { filename, contentType })
+    // Validate environment variables
+    const bucket = process.env.S3_BUCKET
+    if (!bucket) {
+      throw new Error('S3_BUCKET environment variable is not defined')
+    }
 
-    // Create the command for putting the object
+    // Parse and validate request body
+    const body = (await request.json()) as UploadRequestBody
+    if (!body.filename || !body.contentType) {
+      return NextResponse.json(
+        { error: 'Missing required fields: filename or contentType' },
+        { status: 400 },
+      )
+    }
+
+    // Use plain filename to match PayloadCMS expectations
+    const key = body.filename
+
     const command = new PutObjectCommand({
-      Bucket: process.env.S3_BUCKET || '',
-      Key: filename,
-      ContentType: contentType,
-      // Set appropriate ACL
+      Bucket: bucket,
+      Key: key,
+      ContentType: body.contentType,
       ACL: 'public-read',
     })
 
-    // Generate a presigned URL
-    const url = await getSignedUrl(s3, command, {
-      expiresIn: 3600, // URL expires in 1 hour
-    })
-
-    console.log('Generated presigned URL for:', filename)
+    const url = await getSignedUrl(s3, command, { expiresIn: 3600 })
 
     return NextResponse.json({
       url,
-      key: filename,
-      bucket: process.env.S3_BUCKET,
+      key,
+      bucket,
     })
   } catch (error) {
-    console.error('Error generating presigned URL:', error)
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
+    console.error('S3 upload request failed:', error)
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error occurred' },
+      { status: 500 },
+    )
   }
 }
