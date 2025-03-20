@@ -1,69 +1,47 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
-// Configure Edge runtime for better performance
 export const runtime = 'edge'
-
-// Ensure fresh responses
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
 export const revalidate = 0
 
-interface UploadRequestBody {
-  filename: string
-  contentType: string
-}
+// Validate environment variables
+const requiredEnvVars = ['S3_REGION', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY', 'S3_BUCKET']
+requiredEnvVars.forEach((varName) => {
+  if (!process.env[varName]) {
+    throw new Error(`Missing required environment variable: ${varName}`)
+  }
+})
 
-// Initialize S3 client with environment variables
 const s3 = new S3Client({
-  region: process.env.S3_REGION,
+  region: process.env.S3_REGION as string,
   credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY_ID ?? '',
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? '',
+    accessKeyId: process.env.S3_ACCESS_KEY_ID as string,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY as string,
   },
   forcePathStyle: true,
 })
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request): Promise<NextResponse> {
   try {
-    // Validate environment variables
-    const bucket = process.env.S3_BUCKET
-    if (!bucket) {
-      throw new Error('S3_BUCKET environment variable is not defined')
-    }
+    const { filename, contentType } = await request.json()
+    if (!filename || !contentType) throw new Error('Missing filename or contentType')
 
-    // Parse and validate request body
-    const body = (await request.json()) as UploadRequestBody
-    if (!body.filename || !body.contentType) {
-      return NextResponse.json(
-        { error: 'Missing required fields: filename or contentType' },
-        { status: 400 },
-      )
-    }
-
-    // Use plain filename to match PayloadCMS expectations
-    const key = body.filename
+    const key = filename
 
     const command = new PutObjectCommand({
-      Bucket: bucket,
+      Bucket: process.env.S3_BUCKET as string, // Also assert here
       Key: key,
-      ContentType: body.contentType,
+      ContentType: contentType,
       ACL: 'public-read',
     })
 
     const url = await getSignedUrl(s3, command, { expiresIn: 3600 })
-
-    return NextResponse.json({
-      url,
-      key,
-      bucket,
-    })
+    return NextResponse.json({ url, key, bucket: process.env.S3_BUCKET })
   } catch (error) {
     console.error('S3 upload request failed:', error)
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error occurred' },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: (error as Error).message }, { status: 400 })
   }
 }
