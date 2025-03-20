@@ -1,5 +1,6 @@
 import { CollectionConfig } from 'payload'
 import { soundcloudEmbed } from '@/fields/soundcloud'
+import { videoEmbed } from '@/fields/videoEmbed'
 
 export const SoundDesign: CollectionConfig = {
   slug: 'sound-design',
@@ -42,5 +43,6 @@ export const SoundDesign: CollectionConfig = {
       relationTo: 'media',
     },
     soundcloudEmbed,
+    videoEmbed,
   ],
 }

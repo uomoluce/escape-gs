@@ -18,6 +18,7 @@ export interface Item {
   duration?: string
   url?: string
   soundcloudEmbed?: string
+  videoEmbed?: string
   audio?: {
     url: string
     mimeType: string

@@ -760,6 +760,10 @@ export interface Discography {
    * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
    */
   soundcloudEmbed?: string | null;
+  /**
+   * Paste the YouTube or Vimeo embed code here. This will be used to display the video in the list.
+   */
+  videoEmbed?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -778,6 +782,10 @@ export interface Mix {
    * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
    */
   soundcloudEmbed?: string | null;
+  /**
+   * Paste the YouTube or Vimeo embed code here. This will be used to display the video in the list.
+   */
+  videoEmbed?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -790,13 +798,18 @@ export interface Event {
   year: number;
   title: string;
   location: string;
+  type?: ('unset' | 'live' | 'dj-set' | 'residence') | null;
   url?: string | null;
   audio?: (number | null) | Media;
+  image?: (number | null) | Media;
   /**
    * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
    */
   soundcloudEmbed?: string | null;
-  image?: (number | null) | Media;
+  /**
+   * Paste the YouTube or Vimeo embed code here. This will be used to display the video in the list.
+   */
+  videoEmbed?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -841,6 +854,10 @@ export interface SoundDesign {
    * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
    */
   soundcloudEmbed?: string | null;
+  /**
+   * Paste the YouTube or Vimeo embed code here. This will be used to display the video in the list.
+   */
+  videoEmbed?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1425,6 +1442,7 @@ export interface DiscographySelect<T extends boolean = true> {
   url?: T;
   audio?: T;
   soundcloudEmbed?: T;
+  videoEmbed?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1439,6 +1457,7 @@ export interface MixesSelect<T extends boolean = true> {
   url?: T;
   audio?: T;
   soundcloudEmbed?: T;
+  videoEmbed?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1450,10 +1469,12 @@ export interface EventsSelect<T extends boolean = true> {
   year?: T;
   title?: T;
   location?: T;
+  type?: T;
   url?: T;
   audio?: T;
-  soundcloudEmbed?: T;
   image?: T;
+  soundcloudEmbed?: T;
+  videoEmbed?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1481,6 +1502,7 @@ export interface SoundDesignSelect<T extends boolean = true> {
   url?: T;
   audio?: T;
   soundcloudEmbed?: T;
+  videoEmbed?: T;
   updatedAt?: T;
   createdAt?: T;
 }

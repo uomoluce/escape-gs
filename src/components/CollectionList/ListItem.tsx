@@ -23,7 +23,9 @@ export const ListItem: React.FC<ListItemProps> = ({
   const gridTemplateColumns = columns.map((col) => col.width || '1fr').join(' ')
 
   const hasPlayableContent =
-    (item.audio?.mimeType?.startsWith('audio/') && item.audio?.url) || Boolean(item.soundcloudEmbed)
+    (item.audio?.mimeType?.startsWith('audio/') && item.audio?.url) ||
+    Boolean(item.soundcloudEmbed) ||
+    Boolean(item.videoEmbed)
   const hasExternalUrl = Boolean(item.url)
   const hasImage = Boolean(item.image?.url)
 
@@ -194,7 +196,9 @@ export const ListItem: React.FC<ListItemProps> = ({
       >
         {isPlaying && isAudioVisible && item.audio?.mimeType?.startsWith('audio/')
           ? 'PAUSE'
-          : 'PLAY'}
+          : item.videoEmbed
+            ? 'WATCH'
+            : 'PLAY'}
       </button>
     )
   }
@@ -254,6 +258,15 @@ export const ListItem: React.FC<ListItemProps> = ({
   }
 
   const renderAudioPlayer = () => {
+    if (item.videoEmbed) {
+      return (
+        <div
+          className="w-[calc(100%-76px)] ml-[76px] my-4"
+          dangerouslySetInnerHTML={{ __html: item.videoEmbed }}
+        />
+      )
+    }
+
     if (item.soundcloudEmbed) {
       return (
         <div

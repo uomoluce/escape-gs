@@ -15,8 +15,10 @@ export default async function Page() {
       date: true,
       location: true,
       url: true,
+      type: true,
       audio: true,
       soundcloudEmbed: true,
+      videoEmbed: true,
       image: {
         url: true,
         sizes: {
@@ -32,6 +34,7 @@ export default async function Page() {
   const columns = [
     { field: 'year', width: '60px' },
     { field: 'play', width: '100px' },
+    { field: 'type', width: '100px' },
     { field: 'title' },
     { field: 'location' },
     // { field: 'duration', width: '150px' },
@@ -61,15 +64,23 @@ export default async function Page() {
           }
         : null
 
+    // Determine type from checkboxes
+    let type = undefined
+    if (item.type?.isLive) type = 'Live'
+    else if (item.type?.isDjSet) type = 'DJ Set'
+    else if (item.type?.isResidence) type = 'Residence'
+
     return {
       id: String(item.id),
       title: item.title,
       year: item.year,
       location: item.location,
+      type,
       url: item.url || undefined,
       audio,
       image,
       soundcloudEmbed: item.soundcloudEmbed || undefined,
+      videoEmbed: item.videoEmbed || undefined,
     }
   })
 

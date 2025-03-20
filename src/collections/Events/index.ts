@@ -1,5 +1,6 @@
 import { CollectionConfig } from 'payload'
 import { soundcloudEmbed } from '@/fields/soundcloud'
+import { videoEmbed } from '@/fields/videoEmbed'
 
 export const Events: CollectionConfig = {
   slug: 'events',
@@ -29,6 +30,18 @@ export const Events: CollectionConfig = {
       required: true,
     },
     {
+      name: 'type',
+      type: 'select',
+      required: false,
+      defaultValue: 'unset',
+      options: [
+        { label: 'N/A', value: 'unset' },
+        { label: 'Live', value: 'live' },
+        { label: 'DJ Set', value: 'dj-set' },
+        { label: 'Residence', value: 'residence' },
+      ],
+    },
+    {
       name: 'url',
       type: 'text',
       required: false,
@@ -38,11 +51,12 @@ export const Events: CollectionConfig = {
       type: 'upload',
       relationTo: 'media',
     },
-    soundcloudEmbed,
     {
       name: 'image',
       type: 'upload',
       relationTo: 'media',
     },
+    soundcloudEmbed,
+    videoEmbed,
   ],
 }
