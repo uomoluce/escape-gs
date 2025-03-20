@@ -1,7 +1,8 @@
 // storage-adapter-import-placeholder
 import { postgresAdapter } from '@payloadcms/db-postgres'
-// Import Vercel Blob storage only in production
+// Import storage adapters
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
+import { s3Storage } from '@payloadcms/storage-s3'
 
 import sharp from 'sharp' // sharp-import
 import path from 'path'
@@ -110,24 +111,32 @@ export default buildConfig({
   globals: [Header, Footer],
   plugins: [
     ...plugins,
-    // Configure Vercel Blob Storage following best practices
-    vercelBlobStorage({
-      token: process.env.BLOB_READ_WRITE_TOKEN || 'vercel_blob_rw_dummy_123456789',
-      collections: {
-        [Media.slug]: {
-          // Always use Vercel Blob in production
-          disableLocalStorage: process.env.NODE_ENV === 'production',
-          // Enable client-side uploads for large files
-          clientUploads: true,
-          // Add upload limits for client-side uploads
-          limits: {
-            fileSize: 26214400, // 25MB in bytes (leaving room for overhead)
-          },
+    // Configure S3 as primary storage
+    s3Storage({
+      enabled: true,
+      clientUploads: true, // Enable client-side uploads globally
+      collections: {}, // Empty object makes S3 the default for all collections
+      bucket: process.env.S3_BUCKET || '',
+      config: {
+        credentials: {
+          accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
         },
+        region: process.env.S3_REGION || '',
+        // Enable acceleration for faster uploads
+        useAccelerateEndpoint: true,
       },
-      // Enable client uploads globally
-      clientUploads: true,
     }),
+    // Keep Vercel Blob ONLY for accessing existing files
+    ...(process.env.BLOB_READ_WRITE_TOKEN
+      ? [
+          vercelBlobStorage({
+            enabled: false, // Disable globally
+            collections: {}, // Don't configure any collections
+            token: process.env.BLOB_READ_WRITE_TOKEN,
+          }),
+        ]
+      : []),
   ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,

@@ -24,6 +24,8 @@
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.758.0",
+    "@aws-sdk/s3-request-presigner": "^3.758.0",
     "@payloadcms/db-postgres": "^3.28.1",
     "@payloadcms/live-preview-react": "^3.28.1",
     "@payloadcms/next": "^3.28.1",
@@ -35,6 +37,7 @@
     "@payloadcms/plugin-search": "^3.28.1",
     "@payloadcms/plugin-seo": "^3.28.1",
     "@payloadcms/richtext-lexical": "^3.28.1",
+    "@payloadcms/storage-s3": "^3.28.1",
     "@payloadcms/storage-vercel-blob": "^3.28.1",
     "@payloadcms/ui": "^3.28.1",
     "@radix-ui/react-checkbox": "^1.0.4",
