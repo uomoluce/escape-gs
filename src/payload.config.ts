@@ -116,9 +116,7 @@ export default buildConfig({
       enabled: true,
       clientUploads: true, // Enable client-side uploads globally
       collections: {
-        media: {
-          prefix: 'uploads', // Files will be stored as uploads/filename.ext
-        },
+        media: {}, // Remove prefix configuration
       },
       bucket: process.env.S3_BUCKET || '',
       config: {
