@@ -4,8 +4,11 @@ import { notFound } from 'next/navigation'
 
 export const runtime = 'edge'
 
-export async function GET(request: NextRequest, { params }: { params: { filename: string } }) {
-  const filename = params.filename
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ filename: string }> },
+) {
+  const { filename } = await params
 
   try {
     // Search for the blob in Vercel Blob storage
