@@ -115,7 +115,11 @@ export default buildConfig({
     s3Storage({
       enabled: true,
       clientUploads: true, // Enable client-side uploads globally
-      collections: {}, // Empty object makes S3 the default for all collections
+      collections: {
+        media: {
+          prefix: 'uploads', // Files will be stored as uploads/filename.ext
+        },
+      },
       bucket: process.env.S3_BUCKET || '',
       config: {
         credentials: {
@@ -123,6 +127,8 @@ export default buildConfig({
           secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
         },
         region: process.env.S3_REGION || '',
+        // Use virtual hosted-style URLs (bucket.s3.region.amazonaws.com)
+        forcePathStyle: false,
         // Enable acceleration for faster uploads
         useAccelerateEndpoint: true,
       },

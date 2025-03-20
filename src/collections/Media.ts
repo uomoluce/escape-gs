@@ -39,41 +39,49 @@ export const Media: CollectionConfig = {
     },
   ],
   upload: {
-    // Vercel Blob configuration will be applied via the vercelBlobStorage plugin
-    // Do not set staticDir to ensure files are stored in Vercel Blob
+    // Configure upload options
+    staticDir: 'media', // Required for Payload to handle uploads
+    mimeTypes: ['image/*', 'audio/*', 'video/*', 'application/pdf'],
     adminThumbnail: 'thumbnail',
     focalPoint: true,
     imageSizes: [
       {
         name: 'thumbnail',
         width: 300,
+        withoutEnlargement: true,
       },
       {
         name: 'square',
         width: 500,
         height: 500,
+        withoutEnlargement: true,
       },
       {
         name: 'small',
         width: 600,
+        withoutEnlargement: true,
       },
       {
         name: 'medium',
         width: 900,
+        withoutEnlargement: true,
       },
       {
         name: 'large',
         width: 1400,
+        withoutEnlargement: true,
       },
       {
         name: 'xlarge',
         width: 1920,
+        withoutEnlargement: true,
       },
       {
         name: 'og',
         width: 1200,
         height: 630,
         crop: 'center',
+        withoutEnlargement: true,
       },
     ],
   },
