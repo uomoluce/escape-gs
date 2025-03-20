@@ -17,8 +17,7 @@ const s3 = new S3Client({
     accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
     secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
   },
-  // Enable acceleration for faster uploads
-  useAccelerateEndpoint: true,
+  forcePathStyle: true,
 })
 
 export async function POST(request: Request): Promise<NextResponse> {
@@ -28,13 +27,10 @@ export async function POST(request: Request): Promise<NextResponse> {
     const { filename, contentType } = await request.json()
     console.log('Processing S3 upload request:', { filename, contentType })
 
-    // Generate a unique key for the file
-    const key = `${Date.now()}-${Math.random().toString(36).substring(2)}-${filename}`
-
     // Create the command for putting the object
     const command = new PutObjectCommand({
       Bucket: process.env.S3_BUCKET || '',
-      Key: key,
+      Key: filename,
       ContentType: contentType,
       // Set appropriate ACL
       ACL: 'public-read',
@@ -45,15 +41,15 @@ export async function POST(request: Request): Promise<NextResponse> {
       expiresIn: 3600, // URL expires in 1 hour
     })
 
-    console.log('Generated presigned URL for:', key)
+    console.log('Generated presigned URL for:', filename)
 
     return NextResponse.json({
       url,
-      key,
+      key: filename,
       bucket: process.env.S3_BUCKET,
     })
   } catch (error) {
-    console.error('S3 upload request failed:', error)
-    return NextResponse.json({ error: (error as Error).message }, { status: 400 })
+    console.error('Error generating presigned URL:', error)
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
   }
 }
