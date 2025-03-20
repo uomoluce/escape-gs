@@ -78,9 +78,8 @@ export default buildConfig({
       ],
     },
   },
-  // This config helps us configure global or default features that the other editors can inherit
+  debug: true, // Enable debugging
   editor: defaultLexical,
-  // Database configuration optimized for serverless environment
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
@@ -114,9 +113,13 @@ export default buildConfig({
     // Configure S3 as primary storage
     s3Storage({
       enabled: true,
-      clientUploads: true, // Enable client-side uploads globally
+      clientUploads: true,
       collections: {
-        media: {}, // No prefix needed
+        media: {
+          disableLocalStorage: true, // Ensure we only use S3
+          generateFileURL: ({ filename }) =>
+            `https://${process.env.S3_BUCKET}.s3.${process.env.S3_REGION}.amazonaws.com/${filename}`,
+        },
       },
       bucket: process.env.S3_BUCKET || '',
       config: {
@@ -125,9 +128,7 @@ export default buildConfig({
           secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
         },
         region: process.env.S3_REGION || '',
-        // Disable acceleration as it requires additional CORS configuration
         useAccelerateEndpoint: false,
-        // Use path-style URLs for better CORS compatibility
         forcePathStyle: true,
       },
     }),
