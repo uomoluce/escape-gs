@@ -116,7 +116,7 @@ export default buildConfig({
       enabled: true,
       clientUploads: true, // Enable client-side uploads globally
       collections: {
-        media: {}, // Remove prefix configuration
+        media: {}, // No prefix needed
       },
       bucket: process.env.S3_BUCKET || '',
       config: {
@@ -125,10 +125,10 @@ export default buildConfig({
           secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
         },
         region: process.env.S3_REGION || '',
-        // Use virtual hosted-style URLs (bucket.s3.region.amazonaws.com)
-        forcePathStyle: false,
-        // Enable acceleration for faster uploads
-        useAccelerateEndpoint: true,
+        // Disable acceleration as it requires additional CORS configuration
+        useAccelerateEndpoint: false,
+        // Use path-style URLs for better CORS compatibility
+        forcePathStyle: true,
       },
     }),
     // Keep Vercel Blob ONLY for accessing existing files
