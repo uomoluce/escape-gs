@@ -115,21 +115,18 @@ export default buildConfig({
       token: process.env.BLOB_READ_WRITE_TOKEN || 'vercel_blob_rw_dummy_123456789',
       collections: {
         [Media.slug]: {
-          // Only use local storage in development
+          // Always use Vercel Blob in production
           disableLocalStorage: process.env.NODE_ENV === 'production',
           // Enable client-side uploads for large files
           clientUploads: true,
-          // Configure URL generation to use our custom API route
-          generateFileURL: ({ filename }: { filename: string }) => {
-            // Use the custom API route to handle file serving
-            return `${process.env.NEXT_PUBLIC_SERVER_URL}/api/media/file/${filename}`
-          },
           // Add upload limits for client-side uploads
           limits: {
             fileSize: 26214400, // 25MB in bytes (leaving room for overhead)
           },
         },
       },
+      // Enable client uploads globally
+      clientUploads: true,
     }),
   ],
   secret: process.env.PAYLOAD_SECRET,
