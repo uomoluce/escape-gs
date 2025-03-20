@@ -116,9 +116,9 @@ export default buildConfig({
       clientUploads: true,
       collections: {
         media: {
-          disableLocalStorage: true, // Ensure we only use S3
+          disableLocalStorage: true,
           generateFileURL: ({ filename }) =>
-            `https://${process.env.S3_BUCKET}.s3.${process.env.S3_REGION}.amazonaws.com/${filename}`,
+            `https://s3.${process.env.S3_REGION}.amazonaws.com/${process.env.S3_BUCKET}/${filename}`,
         },
       },
       bucket: process.env.S3_BUCKET || '',
