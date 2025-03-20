@@ -15,7 +15,6 @@ export default async function Page() {
       date: true,
       location: true,
       url: true,
-      type: true,
       audio: true,
       soundcloudEmbed: true,
       videoEmbed: true,
