@@ -34,7 +34,7 @@ export default async function Page() {
   const columns = [
     { field: 'year', width: '60px' },
     { field: 'play', width: '100px' },
-    { field: 'type', width: '100px' },
+    // { field: 'type', width: '100px' },
     { field: 'title' },
     { field: 'location' },
     // { field: 'duration', width: '150px' },
@@ -64,18 +64,19 @@ export default async function Page() {
           }
         : null
 
-    // Determine type from checkboxes
-    let type = undefined
-    if (item.type?.isLive) type = 'Live'
-    else if (item.type?.isDjSet) type = 'DJ Set'
-    else if (item.type?.isResidence) type = 'Residence'
+    // // Determine type from select field
+    // let type = undefined
+    // if (item.type === 'live') type = 'Live'
+    // else if (item.type === 'dj-set') type = 'DJ Set'
+    // else if (item.type === 'residence') type = 'Residence'
+    // // not-set will result in undefined type
 
     return {
       id: String(item.id),
       title: item.title,
       year: item.year,
       location: item.location,
-      type,
+      // type,
       url: item.url || undefined,
       audio,
       image,

@@ -798,7 +798,7 @@ export interface Event {
   year: number;
   title: string;
   location: string;
-  type?: ('unset' | 'live' | 'dj-set' | 'residence') | null;
+  type?: ('not-set' | 'live' | 'dj-set' | 'residence') | null;
   url?: string | null;
   audio?: (number | null) | Media;
   image?: (number | null) | Media;

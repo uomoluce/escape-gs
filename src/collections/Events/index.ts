@@ -33,13 +33,13 @@ export const Events: CollectionConfig = {
       name: 'type',
       type: 'select',
       required: false,
-      defaultValue: 'unset',
       options: [
-        { label: 'N/A', value: 'unset' },
+        { label: 'N/A', value: 'not-set' },
         { label: 'Live', value: 'live' },
         { label: 'DJ Set', value: 'dj-set' },
         { label: 'Residence', value: 'residence' },
       ],
+      defaultValue: 'not-set',
     },
     {
       name: 'url',
