@@ -124,6 +124,10 @@ export default buildConfig({
             // Use the custom API route to handle file serving
             return `${process.env.NEXT_PUBLIC_SERVER_URL}/api/media/file/${filename}`
           },
+          // Add upload limits for client-side uploads
+          limits: {
+            fileSize: 26214400, // 25MB in bytes (leaving room for overhead)
+          },
         },
       },
     }),

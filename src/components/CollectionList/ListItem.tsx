@@ -22,7 +22,8 @@ export const ListItem: React.FC<ListItemProps> = ({
   const progressBarRef = useRef<HTMLDivElement>(null)
   const gridTemplateColumns = columns.map((col) => col.width || '1fr').join(' ')
 
-  const hasPlayableContent = item.audio?.mimeType === 'audio/mpeg' || Boolean(item.soundcloudEmbed)
+  const hasPlayableContent =
+    (item.audio?.mimeType?.startsWith('audio/') && item.audio?.url) || Boolean(item.soundcloudEmbed)
   const hasExternalUrl = Boolean(item.url)
   const hasImage = Boolean(item.image?.url)
 
@@ -163,7 +164,7 @@ export const ListItem: React.FC<ListItemProps> = ({
     if (!hasPlayableContent) return
 
     if (isAudioVisible) {
-      if (item.audio?.mimeType === 'audio/mpeg' && isPlaying) {
+      if (item.audio?.mimeType?.startsWith('audio/') && isPlaying) {
         audioRef.current?.pause()
         setIsPlaying(false)
       }
@@ -191,7 +192,9 @@ export const ListItem: React.FC<ListItemProps> = ({
         onClick={handlePlayClick}
         className="inline-flex items-center hover:opacity-75 transition-opacity"
       >
-        {isPlaying && isAudioVisible && item.audio?.mimeType === 'audio/mpeg' ? 'PAUSE' : 'PLAY'}
+        {isPlaying && isAudioVisible && item.audio?.mimeType?.startsWith('audio/')
+          ? 'PAUSE'
+          : 'PLAY'}
       </button>
     )
   }
