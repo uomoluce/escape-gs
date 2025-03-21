@@ -2,7 +2,7 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { buildConfig } from 'payload'
-import type { CollectionBeforeChangeHook, Config } from 'payload'
+import type { CollectionBeforeChangeHook, Config, Plugin } from 'payload'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
@@ -26,13 +26,58 @@ import { defaultLexical } from '@/fields/defaultLexical'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-// Validate required S3 environment variables
-const requiredS3EnvVars = ['S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY', 'S3_REGION']
-requiredS3EnvVars.forEach((varName) => {
-  if (!process.env[varName]) {
-    throw new Error(`Missing required S3 environment variable: ${varName}`)
+// Runtime initialization function
+const initializeStorage = (): Plugin => {
+  const requiredS3EnvVars = ['S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY', 'S3_REGION']
+  const missingVars = requiredS3EnvVars.filter((varName) => !process.env[varName])
+
+  if (missingVars.length > 0) {
+    console.warn(
+      `Missing S3 environment variables: ${missingVars.join(', ')}. Falling back to Vercel Blob storage.`,
+    )
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      return vercelBlobStorage({
+        enabled: true,
+        collections: {
+          media: {
+            disableLocalStorage: true,
+          },
+        },
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+        clientUploads: true, // Enable client-side uploads to bypass 4.5MB limit
+        addRandomSuffix: true, // Add random suffix to prevent naming conflicts
+        cacheControlMaxAge: 31536000, // 1 year cache
+      })
+    }
+    // Return a minimal storage plugin if no storage is configured
+    return vercelBlobStorage({
+      enabled: false,
+      collections: {},
+      token: '',
+    })
   }
-})
+
+  return s3Storage({
+    enabled: true,
+    clientUploads: true,
+    collections: {
+      media: {
+        disableLocalStorage: true,
+        generateFileURL: ({ filename }) =>
+          `https://s3.${process.env.S3_REGION}.amazonaws.com/${process.env.S3_BUCKET}/${filename}`,
+      },
+    },
+    bucket: process.env.S3_BUCKET as string,
+    config: {
+      credentials: {
+        accessKeyId: process.env.S3_ACCESS_KEY_ID as string,
+        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY as string,
+      },
+      region: process.env.S3_REGION as string,
+      forcePathStyle: true,
+    },
+  })
+}
 
 const hideCollection = (collection: any) => ({
   ...collection,
@@ -106,38 +151,7 @@ export default buildConfig({
   ],
   cors: [process.env.NEXT_PUBLIC_SERVER_URL].filter(Boolean),
   globals: [Header, Footer],
-  plugins: [
-    ...plugins,
-    s3Storage({
-      enabled: true,
-      clientUploads: true,
-      collections: {
-        media: {
-          disableLocalStorage: true,
-          generateFileURL: ({ filename }) =>
-            `https://s3.${process.env.S3_REGION}.amazonaws.com/${process.env.S3_BUCKET}/${filename}`,
-        },
-      },
-      bucket: process.env.S3_BUCKET as string, // Type assertion after validation
-      config: {
-        credentials: {
-          accessKeyId: process.env.S3_ACCESS_KEY_ID as string, // Type assertion after validation
-          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY as string, // Type assertion after validation
-        },
-        region: process.env.S3_REGION as string, // Type assertion after validation
-        forcePathStyle: true,
-      },
-    }),
-    ...(process.env.BLOB_READ_WRITE_TOKEN
-      ? [
-          vercelBlobStorage({
-            enabled: false,
-            collections: {},
-            token: process.env.BLOB_READ_WRITE_TOKEN,
-          }),
-        ]
-      : []),
-  ],
+  plugins: [...plugins, initializeStorage()],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },

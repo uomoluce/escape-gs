@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload'
-
 import {
   FixedToolbarFeature,
   InlineToolbarFeature,
@@ -26,7 +25,10 @@ export const Media: CollectionConfig = {
     {
       name: 'alt',
       type: 'text',
-      //required: true,
+      required: false,
+      admin: {
+        description: 'Please provide a description of the image for accessibility',
+      },
     },
     {
       name: 'caption',
@@ -39,8 +41,7 @@ export const Media: CollectionConfig = {
     },
   ],
   upload: {
-    // Configure upload options
-    staticDir: 'media', // Required for Payload to handle uploads
+    staticDir: 'media',
     mimeTypes: ['image/*', 'audio/*', 'video/*', 'application/pdf'],
     adminThumbnail: 'thumbnail',
     focalPoint: true,

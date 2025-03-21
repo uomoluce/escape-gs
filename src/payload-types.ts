@@ -270,6 +270,9 @@ export interface Post {
  */
 export interface Media {
   id: number;
+  /**
+   * Please provide a description of the image for accessibility
+   */
   alt?: string | null;
   caption?: {
     root: {
