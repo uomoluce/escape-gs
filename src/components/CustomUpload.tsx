@@ -15,7 +15,7 @@ export const CustomUpload: React.FC<{ field: UploadField }> = ({ field }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename: file.name, contentType: file.type }),
       })
-      
+
       if (!response.ok) throw new Error('Failed to get upload URL')
       const { url } = await response.json()
 
@@ -25,7 +25,7 @@ export const CustomUpload: React.FC<{ field: UploadField }> = ({ field }) => {
         headers: { 'Content-Type': file.type },
         body: file,
       })
-      
+
       if (!uploadResponse.ok) throw new Error(await uploadResponse.text())
       setUploadStatus('Upload successful!')
     } catch (error) {
