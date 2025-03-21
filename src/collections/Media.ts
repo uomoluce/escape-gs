@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+
 import {
   FixedToolbarFeature,
   InlineToolbarFeature,
@@ -25,10 +26,7 @@ export const Media: CollectionConfig = {
     {
       name: 'alt',
       type: 'text',
-      required: false,
-      admin: {
-        description: 'Please provide a description of the image for accessibility',
-      },
+      //required: true,
     },
     {
       name: 'caption',
@@ -41,48 +39,41 @@ export const Media: CollectionConfig = {
     },
   ],
   upload: {
-    staticDir: 'media',
-    mimeTypes: ['image/*', 'audio/*', 'video/*', 'application/pdf'],
+    // Vercel Blob configuration will be applied via the vercelBlobStorage plugin
+    // Do not set staticDir to ensure files are stored in Vercel Blob
     adminThumbnail: 'thumbnail',
     focalPoint: true,
     imageSizes: [
       {
         name: 'thumbnail',
         width: 300,
-        withoutEnlargement: true,
       },
       {
         name: 'square',
         width: 500,
         height: 500,
-        withoutEnlargement: true,
       },
       {
         name: 'small',
         width: 600,
-        withoutEnlargement: true,
       },
       {
         name: 'medium',
         width: 900,
-        withoutEnlargement: true,
       },
       {
         name: 'large',
         width: 1400,
-        withoutEnlargement: true,
       },
       {
         name: 'xlarge',
         width: 1920,
-        withoutEnlargement: true,
       },
       {
         name: 'og',
         width: 1200,
         height: 630,
         crop: 'center',
-        withoutEnlargement: true,
       },
     ],
   },

@@ -1,141 +1,103 @@
+// storage-adapter-import-placeholder
 import { postgresAdapter } from '@payloadcms/db-postgres'
+// Import Vercel Blob storage only in production
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
-import { s3Storage } from '@payloadcms/storage-s3'
-import { buildConfig } from 'payload'
-import type { CollectionBeforeChangeHook, Config, Plugin } from 'payload'
+
+import sharp from 'sharp' // sharp-import
 import path from 'path'
+import { buildConfig, PayloadRequest, CollectionConfig } from 'payload'
 import { fileURLToPath } from 'url'
-import sharp from 'sharp'
-import { CustomUpload } from './components/CustomUpload'
 
 import { Categories } from './collections/Categories'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
+import { Footer } from './Footer/config'
+import { Header } from './Header/config'
+import { plugins } from './plugins'
+import { defaultLexical } from '@/fields/defaultLexical'
+import { getServerSideURL } from './utilities/getURL'
 import { Discography } from './collections/Discography'
 import { Mixes } from './collections/Mixes'
 import { Events } from './collections/Events'
 import { Curatorship } from './collections/Curatorship'
 import { SoundDesign } from './collections/SoundDesign'
-import { Header } from './Header/config'
-import { Footer } from './Footer/config'
-import { plugins } from './plugins'
-import { defaultLexical } from '@/fields/defaultLexical'
+// import CircleLogo from './components/Logo/CircleLogo'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-// Runtime initialization function
-const initializeStorage = (): Plugin => {
-  const requiredS3EnvVars = [
-    'S3_BUCKET',
-    'AWS_ACCESS_KEY_ID',
-    'AWS_SECRET_ACCESS_KEY',
-    'AWS_REGION',
-  ]
-  const missingVars = requiredS3EnvVars.filter((varName) => !process.env[varName])
-
-  if (missingVars.length > 0) {
-    console.error(`Error: Missing required S3 environment variables: ${missingVars.join(', ')}`)
-    console.error(
-      'Media uploads will be disabled. Please configure S3 environment variables to enable uploads.',
-    )
-    // Return a disabled storage plugin
-    return s3Storage({
-      enabled: false,
-      collections: {},
-      bucket: 'disabled',
-      config: {
-        credentials: {
-          accessKeyId: 'disabled',
-          secretAccessKey: 'disabled',
-        },
-        region: 'disabled',
-      },
-    })
-  }
-
-  return s3Storage({
-    enabled: true,
-    clientUploads: true,
-    collections: {
-      media: {
-        disableLocalStorage: true,
-        generateFileURL: ({ filename }) =>
-          `https://s3.${process.env.AWS_REGION}.amazonaws.com/${process.env.S3_BUCKET}/${filename}`,
-      },
-    },
-    bucket: process.env.S3_BUCKET as string,
-    config: {
-      region: process.env.AWS_REGION as string,
-      forcePathStyle: true,
-    },
-  })
-}
-
-const hideCollection = (collection: any) => ({
+// Helper to hide a collection
+const hideCollection = (collection: CollectionConfig): CollectionConfig => ({
   ...collection,
-  admin: { ...collection.admin, hidden: true },
-})
-
-const beforeChangeHook: CollectionBeforeChangeHook = async ({ data, req, operation }) => {
-  if (operation === 'create' && req.file) {
-    const file = req.file
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/media/s3-upload`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ filename: file.name, contentType: file.mimetype }),
-    })
-    if (!res.ok) throw new Error(`Failed to generate presigned URL: ${await res.text()}`)
-    const { url, key } = await res.json()
-    data.s3UploadUrl = url
-    data.filename = key
-    data.url = `https://s3.${process.env.AWS_REGION}.amazonaws.com/${process.env.S3_BUCKET}/${key}`
-  }
-  return data
-}
-
-const MediaWithCustomUpload = {
-  ...Media,
-  fields: [...(Media.fields || []), { name: 's3UploadUrl', type: 'text', admin: { hidden: true } }],
-  hooks: { beforeChange: [beforeChangeHook] },
   admin: {
-    components: {
-      Field: { upload: CustomUpload },
-    },
+    ...collection.admin,
+    hidden: true,
   },
-}
+})
 
 export default buildConfig({
   admin: {
+    components: {
+      // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
+      // Feel free to delete this at any time. Simply remove the line below and the import `BeforeLogin` statement on line 15.
+      // graphics: {
+      //   Logo: CircleLogo,
+      // },
+      // beforeLogin: ['@/components/BeforeLogin'],
+      // The `BeforeDashboard` component renders the 'welcome' block that you see after logging into your admin panel.
+      // Feel free to delete this at any time. Simply remove the line below and the import `BeforeDashboard` statement on line 15.
+      // beforeDashboard: ['@/components/BeforeDashboard'],
+    },
+    importMap: {
+      baseDir: path.resolve(dirname),
+    },
     user: Users.slug,
     livePreview: {
       breakpoints: [
-        { label: 'Mobile', name: 'mobile', width: 375, height: 667 },
-        { label: 'Tablet', name: 'tablet', width: 768, height: 1024 },
-        { label: 'Desktop', name: 'desktop', width: 1440, height: 900 },
+        {
+          label: 'Mobile',
+          name: 'mobile',
+          width: 375,
+          height: 667,
+        },
+        {
+          label: 'Tablet',
+          name: 'tablet',
+          width: 768,
+          height: 1024,
+        },
+        {
+          label: 'Desktop',
+          name: 'desktop',
+          width: 1440,
+          height: 900,
+        },
       ],
     },
   },
-  debug: true,
+  // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
+  // Database configuration optimized for serverless environment
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URI,
-      ssl: process.env.POSTGRES_SSL === 'true' ? { rejectUnauthorized: false } : false,
-      max: 3,
-      min: 0,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 30000,
+      connectionString: process.env.DATABASE_URI || '',
+      // SSL configuration - only enable in production
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+      // Connection pool settings optimized for migrations and serverless
+      max: 3, // Allow more connections for migrations
+      min: 0, // Start with no connections
+      idleTimeoutMillis: 30000, // Longer timeout for migrations
+      connectionTimeoutMillis: 30000, // Longer connection timeout for migrations
       allowExitOnIdle: true,
-      keepAlive: true,
+      keepAlive: true, // Enable keep-alive for more stable connections
     },
   }),
   collections: [
     hideCollection(Pages),
     Posts,
-    MediaWithCustomUpload,
+    Media,
     Categories,
     Users,
     Discography,
@@ -144,10 +106,47 @@ export default buildConfig({
     Curatorship,
     SoundDesign,
   ],
-  cors: [process.env.NEXT_PUBLIC_SERVER_URL].filter(Boolean),
+  cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
-  plugins: [...plugins, initializeStorage()],
+  plugins: [
+    ...plugins,
+    // Configure Vercel Blob Storage following best practices
+    vercelBlobStorage({
+      token: process.env.BLOB_READ_WRITE_TOKEN || 'vercel_blob_rw_dummy_123456789',
+      collections: {
+        [Media.slug]: {
+          // Always use Vercel Blob in production
+          disableLocalStorage: process.env.NODE_ENV === 'production',
+          // Enable client-side uploads for large files
+          clientUploads: true,
+          // Add upload limits for client-side uploads
+          limits: {
+            fileSize: 26214400, // 25MB in bytes (leaving room for overhead)
+          },
+        },
+      },
+      // Enable client uploads globally
+      clientUploads: true,
+    }),
+  ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
-  typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
-} satisfies Config)
+  typescript: {
+    outputFile: path.resolve(dirname, 'payload-types.ts'),
+  },
+  jobs: {
+    access: {
+      run: ({ req }: { req: PayloadRequest }): boolean => {
+        // Allow logged in users to execute this endpoint (default)
+        if (req.user) return true
+
+        // If there is no logged in user, then check
+        // for the Vercel Cron secret to be present as an
+        // Authorization header:
+        const authHeader = req.headers.get('authorization')
+        return authHeader === `Bearer ${process.env.CRON_SECRET}`
+      },
+    },
+    tasks: [],
+  },
+})

@@ -17,7 +17,6 @@ export default async function Page() {
       url: true,
       audio: true,
       soundcloudEmbed: true,
-      videoEmbed: true,
     },
     sort: '-year', // Sort by year in descending order
   })
@@ -49,7 +48,6 @@ export default async function Page() {
       url: item.url || undefined,
       audio,
       soundcloudEmbed: item.soundcloudEmbed || undefined,
-      videoEmbed: item.videoEmbed || undefined,
     }
   })
 

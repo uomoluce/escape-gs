@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "cross-env NODE_ENV=development NODE_OPTIONS=--no-deprecation payload generate:importmap && payload migrate && next build",
+    "build": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap && payload migrate && next build",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "dev": "cross-env NODE_ENV=development NODE_OPTIONS=--no-deprecation next dev",
     "dev:local": "cross-env NODE_ENV=development NODE_OPTIONS=--no-deprecation dotenv -e .env.development next dev",
@@ -24,8 +24,6 @@
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.758.0",
-    "@aws-sdk/s3-request-presigner": "^3.758.0",
     "@payloadcms/db-postgres": "^3.28.1",
     "@payloadcms/live-preview-react": "^3.28.1",
     "@payloadcms/next": "^3.28.1",
@@ -37,7 +35,6 @@
     "@payloadcms/plugin-search": "^3.28.1",
     "@payloadcms/plugin-seo": "^3.28.1",
     "@payloadcms/richtext-lexical": "^3.28.1",
-    "@payloadcms/storage-s3": "^3.28.1",
     "@payloadcms/storage-vercel-blob": "^3.28.1",
     "@payloadcms/ui": "^3.28.1",
     "@radix-ui/react-checkbox": "^1.0.4",

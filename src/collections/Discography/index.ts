@@ -1,6 +1,5 @@
 import { CollectionConfig } from 'payload'
 import { soundcloudEmbed } from '@/fields/soundcloud'
-import { videoEmbed } from '@/fields/videoEmbed'
 
 export const Discography: CollectionConfig = {
   slug: 'discography',
@@ -57,6 +56,5 @@ export const Discography: CollectionConfig = {
       },
     },
     soundcloudEmbed,
-    videoEmbed,
   ],
 }

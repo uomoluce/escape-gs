@@ -54,7 +54,6 @@ export type SupportedTimezones =
   | 'Asia/Singapore'
   | 'Asia/Tokyo'
   | 'Asia/Seoul'
-  | 'Australia/Brisbane'
   | 'Australia/Sydney'
   | 'Pacific/Guam'
   | 'Pacific/Noumea'
@@ -270,9 +269,6 @@ export interface Post {
  */
 export interface Media {
   id: number;
-  /**
-   * Please provide a description of the image for accessibility
-   */
   alt?: string | null;
   caption?: {
     root: {
@@ -289,7 +285,6 @@ export interface Media {
     };
     [k: string]: unknown;
   } | null;
-  s3UploadUrl?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -639,7 +634,6 @@ export interface Form {
             label?: string | null;
             width?: number | null;
             defaultValue?: string | null;
-            placeholder?: string | null;
             options?:
               | {
                   label: string;
@@ -766,10 +760,6 @@ export interface Discography {
    * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
    */
   soundcloudEmbed?: string | null;
-  /**
-   * Paste the YouTube or Vimeo embed code here. This will be used to display the video in the list.
-   */
-  videoEmbed?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -788,10 +778,6 @@ export interface Mix {
    * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
    */
   soundcloudEmbed?: string | null;
-  /**
-   * Paste the YouTube or Vimeo embed code here. This will be used to display the video in the list.
-   */
-  videoEmbed?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -804,18 +790,13 @@ export interface Event {
   year: number;
   title: string;
   location: string;
-  type?: ('not-set' | 'live' | 'dj-set' | 'residence') | null;
   url?: string | null;
   audio?: (number | null) | Media;
-  image?: (number | null) | Media;
   /**
    * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
    */
   soundcloudEmbed?: string | null;
-  /**
-   * Paste the YouTube or Vimeo embed code here. This will be used to display the video in the list.
-   */
-  videoEmbed?: string | null;
+  image?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
 }
@@ -860,10 +841,6 @@ export interface SoundDesign {
    * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
    */
   soundcloudEmbed?: string | null;
-  /**
-   * Paste the YouTube or Vimeo embed code here. This will be used to display the video in the list.
-   */
-  videoEmbed?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1314,7 +1291,6 @@ export interface PostsSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
-  s3UploadUrl?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1449,7 +1425,6 @@ export interface DiscographySelect<T extends boolean = true> {
   url?: T;
   audio?: T;
   soundcloudEmbed?: T;
-  videoEmbed?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1464,7 +1439,6 @@ export interface MixesSelect<T extends boolean = true> {
   url?: T;
   audio?: T;
   soundcloudEmbed?: T;
-  videoEmbed?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1476,12 +1450,10 @@ export interface EventsSelect<T extends boolean = true> {
   year?: T;
   title?: T;
   location?: T;
-  type?: T;
   url?: T;
   audio?: T;
-  image?: T;
   soundcloudEmbed?: T;
-  videoEmbed?: T;
+  image?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1509,7 +1481,6 @@ export interface SoundDesignSelect<T extends boolean = true> {
   url?: T;
   audio?: T;
   soundcloudEmbed?: T;
-  videoEmbed?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1594,7 +1565,6 @@ export interface FormsSelect<T extends boolean = true> {
               label?: T;
               width?: T;
               defaultValue?: T;
-              placeholder?: T;
               options?:
                 | T
                 | {
