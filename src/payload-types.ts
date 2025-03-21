@@ -54,6 +54,7 @@ export type SupportedTimezones =
   | 'Asia/Singapore'
   | 'Asia/Tokyo'
   | 'Asia/Seoul'
+  | 'Australia/Brisbane'
   | 'Australia/Sydney'
   | 'Pacific/Guam'
   | 'Pacific/Noumea'
@@ -634,6 +635,7 @@ export interface Form {
             label?: string | null;
             width?: number | null;
             defaultValue?: string | null;
+            placeholder?: string | null;
             options?:
               | {
                   label: string;
@@ -760,6 +762,10 @@ export interface Discography {
    * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
    */
   soundcloudEmbed?: string | null;
+  /**
+   * Paste the YouTube or Vimeo embed code here. This will be used to display the video in the list.
+   */
+  videoEmbed?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -778,6 +784,10 @@ export interface Mix {
    * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
    */
   soundcloudEmbed?: string | null;
+  /**
+   * Paste the YouTube or Vimeo embed code here. This will be used to display the video in the list.
+   */
+  videoEmbed?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -796,6 +806,10 @@ export interface Event {
    * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
    */
   soundcloudEmbed?: string | null;
+  /**
+   * Paste the YouTube or Vimeo embed code here. This will be used to display the video in the list.
+   */
+  videoEmbed?: string | null;
   image?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
@@ -841,6 +855,10 @@ export interface SoundDesign {
    * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
    */
   soundcloudEmbed?: string | null;
+  /**
+   * Paste the YouTube or Vimeo embed code here. This will be used to display the video in the list.
+   */
+  videoEmbed?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1425,6 +1443,7 @@ export interface DiscographySelect<T extends boolean = true> {
   url?: T;
   audio?: T;
   soundcloudEmbed?: T;
+  videoEmbed?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1439,6 +1458,7 @@ export interface MixesSelect<T extends boolean = true> {
   url?: T;
   audio?: T;
   soundcloudEmbed?: T;
+  videoEmbed?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1453,6 +1473,7 @@ export interface EventsSelect<T extends boolean = true> {
   url?: T;
   audio?: T;
   soundcloudEmbed?: T;
+  videoEmbed?: T;
   image?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1481,6 +1502,7 @@ export interface SoundDesignSelect<T extends boolean = true> {
   url?: T;
   audio?: T;
   soundcloudEmbed?: T;
+  videoEmbed?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1565,6 +1587,7 @@ export interface FormsSelect<T extends boolean = true> {
               label?: T;
               width?: T;
               defaultValue?: T;
+              placeholder?: T;
               options?:
                 | T
                 | {

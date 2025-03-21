@@ -1,5 +1,6 @@
 import { CollectionConfig } from 'payload'
 import { soundcloudEmbed } from '@/fields/soundcloud'
+import { videoEmbed } from '@/fields/videoEmbed'
 
 export const Events: CollectionConfig = {
   slug: 'events',
@@ -39,6 +40,7 @@ export const Events: CollectionConfig = {
       relationTo: 'media',
     },
     soundcloudEmbed,
+    videoEmbed,
     {
       name: 'image',
       type: 'upload',
