@@ -28,32 +28,31 @@ const dirname = path.dirname(filename)
 
 // Runtime initialization function
 const initializeStorage = (): Plugin => {
-  const requiredS3EnvVars = ['S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY', 'S3_REGION']
+  const requiredS3EnvVars = [
+    'S3_BUCKET',
+    'AWS_ACCESS_KEY_ID',
+    'AWS_SECRET_ACCESS_KEY',
+    'AWS_REGION',
+  ]
   const missingVars = requiredS3EnvVars.filter((varName) => !process.env[varName])
 
   if (missingVars.length > 0) {
-    console.warn(
-      `Missing S3 environment variables: ${missingVars.join(', ')}. Falling back to Vercel Blob storage.`,
+    console.error(`Error: Missing required S3 environment variables: ${missingVars.join(', ')}`)
+    console.error(
+      'Media uploads will be disabled. Please configure S3 environment variables to enable uploads.',
     )
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
-      return vercelBlobStorage({
-        enabled: true,
-        collections: {
-          media: {
-            disableLocalStorage: true,
-          },
-        },
-        token: process.env.BLOB_READ_WRITE_TOKEN,
-        clientUploads: true, // Enable client-side uploads to bypass 4.5MB limit
-        addRandomSuffix: true, // Add random suffix to prevent naming conflicts
-        cacheControlMaxAge: 31536000, // 1 year cache
-      })
-    }
-    // Return a minimal storage plugin if no storage is configured
-    return vercelBlobStorage({
+    // Return a disabled storage plugin
+    return s3Storage({
       enabled: false,
       collections: {},
-      token: '',
+      bucket: 'disabled',
+      config: {
+        credentials: {
+          accessKeyId: 'disabled',
+          secretAccessKey: 'disabled',
+        },
+        region: 'disabled',
+      },
     })
   }
 
@@ -64,16 +63,12 @@ const initializeStorage = (): Plugin => {
       media: {
         disableLocalStorage: true,
         generateFileURL: ({ filename }) =>
-          `https://s3.${process.env.S3_REGION}.amazonaws.com/${process.env.S3_BUCKET}/${filename}`,
+          `https://s3.${process.env.AWS_REGION}.amazonaws.com/${process.env.S3_BUCKET}/${filename}`,
       },
     },
     bucket: process.env.S3_BUCKET as string,
     config: {
-      credentials: {
-        accessKeyId: process.env.S3_ACCESS_KEY_ID as string,
-        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY as string,
-      },
-      region: process.env.S3_REGION as string,
+      region: process.env.AWS_REGION as string,
       forcePathStyle: true,
     },
   })
@@ -96,7 +91,7 @@ const beforeChangeHook: CollectionBeforeChangeHook = async ({ data, req, operati
     const { url, key } = await res.json()
     data.s3UploadUrl = url
     data.filename = key
-    data.url = `https://s3.${process.env.S3_REGION}.amazonaws.com/${process.env.S3_BUCKET}/${key}`
+    data.url = `https://s3.${process.env.AWS_REGION}.amazonaws.com/${process.env.S3_BUCKET}/${key}`
   }
   return data
 }
