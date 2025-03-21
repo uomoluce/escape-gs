@@ -1,29 +1,32 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useFormFields } from '@payloadcms/ui'
 import type { UploadField } from 'payload'
 
 export const CustomUpload: React.FC<{ field: UploadField }> = ({ field }) => {
   const [uploadStatus, setUploadStatus] = useState<string | null>(null)
-  const [s3UploadUrl] = useFormFields(([fields]) => [
-    fields.s3UploadUrl?.value as string | undefined,
-  ])
 
   const handleUpload = async (file: File) => {
-    if (!s3UploadUrl) {
-      setUploadStatus('No upload URL available')
-      return
-    }
-
+    // Get the presigned URL from your API
     try {
+      setUploadStatus('Getting upload URL...')
+      const response = await fetch('/api/upload-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, contentType: file.type }),
+      })
+      
+      if (!response.ok) throw new Error('Failed to get upload URL')
+      const { url } = await response.json()
+
       setUploadStatus('Uploading...')
-      const response = await fetch(s3UploadUrl, {
+      const uploadResponse = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': file.type },
         body: file,
       })
-      if (!response.ok) throw new Error(await response.text())
+      
+      if (!uploadResponse.ok) throw new Error(await uploadResponse.text())
       setUploadStatus('Upload successful!')
     } catch (error) {
       setUploadStatus(`Upload failed: ${(error as Error).message}`)
