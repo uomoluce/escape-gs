@@ -330,6 +330,10 @@ export const ListItem: React.FC<ListItemProps> = ({
                 crossOrigin="anonymous"
                 preload="metadata"
                 key={item.audioUrl}
+                onLoadedMetadata={(e) => {
+                  const audio = e.target as HTMLAudioElement
+                  setDuration(audio.duration)
+                }}
                 onEnded={() => {
                   setIsPlaying(false)
                   resetPlayerState(0)
@@ -338,9 +342,8 @@ export const ListItem: React.FC<ListItemProps> = ({
                 onError={(e) => {
                   console.error('Audio playback error:', e)
                 }}
-              >
-                <source src={item.audioUrl} type="audio/mpeg" />
-              </audio>
+                src={item.audioUrl}
+              />
             </div>
           </div>
         )
