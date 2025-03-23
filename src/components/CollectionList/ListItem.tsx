@@ -301,28 +301,26 @@ export const ListItem: React.FC<ListItemProps> = ({
       case 'title':
         return (
           <div className="flex items-center gap-2">
-            {hasImage && (
-              <button
-                className="w-6 h-6 flex items-center justify-center rounded-full border border-foreground transition-colors hover:bg-foreground hover:text-background"
-                onMouseEnter={() => setShowImage(true)}
-                onMouseLeave={() => setShowImage(false)}
-                onMouseMove={handleMouseMove}
-                aria-label="Show image"
-              >
-                <ImageIcon size={12} />
-              </button>
-            )}
             {item.url ? (
               <Link
                 href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline"
+                onMouseEnter={() => hasImage && setShowImage(true)}
+                onMouseLeave={() => hasImage && setShowImage(false)}
+                onMouseMove={handleMouseMove}
               >
                 {item.title}
               </Link>
             ) : (
-              item.title
+              <span
+                onMouseEnter={() => hasImage && setShowImage(true)}
+                onMouseLeave={() => hasImage && setShowImage(false)}
+                onMouseMove={handleMouseMove}
+              >
+                {item.title}
+              </span>
             )}
           </div>
         )
