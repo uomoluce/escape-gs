@@ -29,6 +29,17 @@ export const ListItem: React.FC<ListItemProps> = ({
   const hasExternalUrl = Boolean(item.url)
   const hasImage = Boolean(item.image?.url)
 
+  // Add a hidden audio element to preload metadata
+  useEffect(() => {
+    if (item.audioUrl) {
+      const audio = new Audio(item.audioUrl)
+      audio.preload = 'metadata'
+      audio.addEventListener('loadedmetadata', () => {
+        setDuration(audio.duration)
+      })
+    }
+  }, [item.audioUrl])
+
   // Add a reset function to ensure consistent state when switching tracks
   const resetPlayerState = (newTime = 0) => {
     if (audioRef.current) {
@@ -248,15 +259,18 @@ export const ListItem: React.FC<ListItemProps> = ({
   const renderDuration = () => {
     if (!item.audioUrl) return item.duration || null
 
-    if (isAudioVisible && isPlaying) {
-      return (
-        <div className="text-right tabular-nums">
-          {formatTime(currentTime)} / {formatTime(duration)}
-        </div>
-      )
+    if (duration > 0) {
+      if (isAudioVisible && isPlaying) {
+        return (
+          <div className="text-right tabular-nums">
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </div>
+        )
+      }
+      return <div className="tabular-nums text-right">{formatTime(duration)}</div>
     }
 
-    return <div className="tabular-nums text-right">{formatTime(duration)}</div>
+    return <div className="tabular-nums text-right">--:--</div>
   }
 
   const renderCell = (field: string) => {
