@@ -25,6 +25,21 @@ export const Events: CollectionConfig = {
       required: true,
     },
     {
+      name: 'eventType',
+      type: 'select',
+      required: true,
+      defaultValue: 'n_a',
+      options: [
+        { label: 'DJ Set', value: 'dj_set' },
+        { label: 'Live', value: 'live' },
+        { label: 'Residency', value: 'residency' },
+        { label: 'N/A', value: 'n_a' },
+      ],
+      admin: {
+        description: 'Type of event',
+      },
+    },
+    {
       name: 'location',
       type: 'text',
       required: true,

@@ -18,6 +18,7 @@ export default async function Page() {
       audioUrl: true,
       soundcloudEmbed: true,
       videoEmbed: true,
+      eventType: true,
       image: {
         url: true,
         sizes: {
@@ -35,6 +36,7 @@ export default async function Page() {
     { field: 'play', width: '60px' },
     { field: 'watch', width: '100px' },
     { field: 'title' },
+    { field: 'eventType', width: '100px' },
     { field: 'location' },
     // { field: 'duration', width: '150px' },
   ]
@@ -54,6 +56,14 @@ export default async function Page() {
           }
         : null
 
+    // Map event type to display label
+    const eventTypeLabels: Record<string, string> = {
+      dj_set: 'DJ Set',
+      live: 'Live',
+      residency: 'Residency',
+      n_a: 'N/A',
+    }
+
     return {
       id: String(item.id),
       title: item.title,
@@ -64,6 +74,7 @@ export default async function Page() {
       image,
       soundcloudEmbed: item.soundcloudEmbed || undefined,
       videoEmbed: item.videoEmbed || undefined,
+      eventType: eventTypeLabels[item.eventType] || 'N/A',
     }
   })
 

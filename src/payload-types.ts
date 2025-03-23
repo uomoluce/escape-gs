@@ -802,6 +802,10 @@ export interface Event {
   id: number;
   year: number;
   title: string;
+  /**
+   * Type of event
+   */
+  eventType: 'dj_set' | 'live' | 'residency' | 'n_a';
   location: string;
   url?: string | null;
   /**
@@ -1478,6 +1482,7 @@ export interface MixesSelect<T extends boolean = true> {
 export interface EventsSelect<T extends boolean = true> {
   year?: T;
   title?: T;
+  eventType?: T;
   location?: T;
   url?: T;
   audioUrl?: T;

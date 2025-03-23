@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { ImageIcon, PauseIcon, PlayIcon } from 'lucide-react'
 import type { ListItemProps } from './types'
 
 export const ListItem: React.FC<ListItemProps> = ({
@@ -274,11 +275,62 @@ export const ListItem: React.FC<ListItemProps> = ({
   }
 
   const renderCell = (field: string) => {
-    if (field === 'play') return renderPlayButton()
-    if (field === 'watch') return renderWatchButton()
-    if (field === 'title') return renderTitle()
-    if (field === 'duration') return renderDuration()
-    return item[field]
+    switch (field) {
+      case 'year':
+        return item.year
+      case 'play':
+        return hasAudioContent ? (
+          <button
+            onClick={onAudioToggle}
+            className="inline-flex items-center hover:opacity-75 transition-opacity"
+            aria-label={isAudioVisible ? 'Hide audio player' : 'Show audio player'}
+          >
+            {isAudioVisible ? 'PAUSE' : 'PLAY'}
+          </button>
+        ) : null
+      case 'watch':
+        return hasVideoContent ? (
+          <button
+            onClick={onVideoToggle}
+            className="inline-flex items-center hover:opacity-75 transition-opacity"
+            aria-label={isVideoVisible ? 'Hide video player' : 'Show video player'}
+          >
+            {isVideoVisible ? 'HIDE' : 'WATCH'}
+          </button>
+        ) : null
+      case 'title':
+        return (
+          <div className="flex items-center gap-2">
+            {hasImage && (
+              <button
+                className="w-6 h-6 flex items-center justify-center rounded-full border border-foreground transition-colors hover:bg-foreground hover:text-background"
+                onMouseEnter={() => setShowImage(true)}
+                onMouseLeave={() => setShowImage(false)}
+                onMouseMove={handleMouseMove}
+                aria-label="Show image"
+              >
+                <ImageIcon size={12} />
+              </button>
+            )}
+            {item.url ? (
+              <Link
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+              >
+                {item.title}
+              </Link>
+            ) : (
+              item.title
+            )}
+          </div>
+        )
+      case 'eventType':
+        return item.eventType
+      default:
+        return item[field]
+    }
   }
 
   const renderMediaPlayer = () => {
