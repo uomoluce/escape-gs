@@ -28,10 +28,15 @@ export const CollectionList = ({
     (item) => Boolean(item.audioUrl) || Boolean(item.soundcloudEmbed),
   )
 
+  // Do the video check on the server
+  const hasVideoContent = items.some((item) => Boolean(item.videoEmbed))
+
   // Filter columns on the server
-  const columns = hasAudioContent
-    ? initialColumns
-    : initialColumns.filter((col) => col.field !== 'play' && col.field !== 'duration')
+  const columns = initialColumns.filter((col) => {
+    if (!hasAudioContent && (col.field === 'play' || col.field === 'duration')) return false
+    if (!hasVideoContent && col.field === 'watch') return false
+    return true
+  })
 
   return (
     <div className="container mb-20">

@@ -37,5 +37,7 @@ export interface ListItemProps {
   columns: Column[]
   collectionType?: CollectionType
   isAudioVisible: boolean
+  isVideoVisible: boolean
   onAudioToggle: () => void
+  onVideoToggle: () => void
 }

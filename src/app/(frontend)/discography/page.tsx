@@ -16,13 +16,15 @@ export default async function Page() {
       url: true,
       audioUrl: true,
       soundcloudEmbed: true,
+      videoEmbed: true,
     },
     sort: '-year',
   })
 
   const columns = [
     { field: 'year', width: '60px' },
-    { field: 'play', width: '100px' },
+    { field: 'play', width: '60px' },
+    { field: 'watch', width: '100px' },
     { field: 'title', width: 'minmax(250px, 2fr)' },
     { field: 'label', width: 'minmax(120px, 1fr)' },
     { field: 'type', width: 'minmax(100px, 1fr)' },
@@ -38,6 +40,7 @@ export default async function Page() {
     url: item.url || undefined,
     audioUrl: item.audioUrl || undefined,
     soundcloudEmbed: item.soundcloudEmbed || undefined,
+    videoEmbed: item.videoEmbed || undefined,
   }))
 
   return <CollectionList columns={columns} items={items} collectionType="discography" />

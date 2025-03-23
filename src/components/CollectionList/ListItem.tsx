@@ -10,7 +10,9 @@ export const ListItem: React.FC<ListItemProps> = ({
   columns,
   collectionType = 'default',
   isAudioVisible,
+  isVideoVisible,
   onAudioToggle,
+  onVideoToggle,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
@@ -22,8 +24,8 @@ export const ListItem: React.FC<ListItemProps> = ({
   const progressBarRef = useRef<HTMLDivElement>(null)
   const gridTemplateColumns = columns.map((col) => col.width || '1fr').join(' ')
 
-  const hasPlayableContent =
-    Boolean(item.audioUrl) || Boolean(item.soundcloudEmbed) || Boolean(item.videoEmbed)
+  const hasAudioContent = Boolean(item.audioUrl) || Boolean(item.soundcloudEmbed)
+  const hasVideoContent = Boolean(item.videoEmbed)
   const hasExternalUrl = Boolean(item.url)
   const hasImage = Boolean(item.image?.url)
 
@@ -161,7 +163,7 @@ export const ListItem: React.FC<ListItemProps> = ({
   }
 
   const handlePlayClick = () => {
-    if (!hasPlayableContent) return
+    if (!hasAudioContent) return
 
     if (isAudioVisible) {
       if (item.audioUrl && isPlaying) {
@@ -185,18 +187,27 @@ export const ListItem: React.FC<ListItemProps> = ({
   }
 
   const renderPlayButton = () => {
-    if (!hasPlayableContent) return null
+    if (!hasAudioContent) return null
 
     return (
       <button
         onClick={handlePlayClick}
         className="inline-flex items-center hover:opacity-75 transition-opacity"
       >
-        {isPlaying && isAudioVisible && item.audioUrl
-          ? 'PAUSE'
-          : item.videoEmbed
-            ? 'WATCH'
-            : 'PLAY'}
+        {isPlaying && isAudioVisible ? 'PAUSE' : 'PLAY'}
+      </button>
+    )
+  }
+
+  const renderWatchButton = () => {
+    if (!hasVideoContent) return null
+
+    return (
+      <button
+        onClick={onVideoToggle}
+        className="inline-flex items-center hover:opacity-75 transition-opacity"
+      >
+        {isVideoVisible ? 'HIDE' : 'WATCH'}
       </button>
     )
   }
@@ -250,14 +261,14 @@ export const ListItem: React.FC<ListItemProps> = ({
 
   const renderCell = (field: string) => {
     if (field === 'play') return renderPlayButton()
+    if (field === 'watch') return renderWatchButton()
     if (field === 'title') return renderTitle()
     if (field === 'duration') return renderDuration()
     return item[field]
   }
 
-  const renderAudioPlayer = () => {
-    // First check for video embed as it takes precedence
-    if (item.videoEmbed) {
+  const renderMediaPlayer = () => {
+    if (isVideoVisible && item.videoEmbed) {
       return (
         <div
           className="w-[calc(100%-76px)] ml-[76px] my-4"
@@ -266,68 +277,70 @@ export const ListItem: React.FC<ListItemProps> = ({
       )
     }
 
-    // Then prefer our own audio URL if available
-    if (item.audioUrl) {
-      return (
-        <div
-          className="grid gap-y-2 w-[calc(100%-76px)] ml-[76px] mb-4"
-          style={{ gridTemplateColumns }}
-        >
-          <div></div>
-          <div className="col-span-full">
-            <div className="flex items-center">
-              <div
-                ref={progressBarRef}
-                className="flex-grow h-[2px] bg-border cursor-pointer relative group"
-                onClick={handleSeek}
-                onMouseDown={handleMouseDown}
-                aria-label="Audio progress"
-                aria-valuemin={0}
-                aria-valuemax={duration || 100}
-                aria-valuenow={currentTime}
-                aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
-              >
-                {/* Progress fill */}
+    if (isAudioVisible) {
+      // Then prefer our own audio URL if available
+      if (item.audioUrl) {
+        return (
+          <div
+            className="grid gap-y-2 w-[calc(100%-76px)] ml-[76px] mb-4"
+            style={{ gridTemplateColumns }}
+          >
+            <div></div>
+            <div className="col-span-full">
+              <div className="flex items-center">
                 <div
-                  className="absolute top-0 left-0 bottom-0 bg-foreground group-hover:bg-primary transition-colors"
-                  style={{
-                    width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
-                    transition: isDragging ? 'none' : 'width 0.1s linear',
-                  }}
-                />
+                  ref={progressBarRef}
+                  className="flex-grow h-[2px] bg-border cursor-pointer relative group"
+                  onClick={handleSeek}
+                  onMouseDown={handleMouseDown}
+                  aria-label="Audio progress"
+                  aria-valuemin={0}
+                  aria-valuemax={duration || 100}
+                  aria-valuenow={currentTime}
+                  aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
+                >
+                  {/* Progress fill */}
+                  <div
+                    className="absolute top-0 left-0 bottom-0 bg-foreground group-hover:bg-primary transition-colors"
+                    style={{
+                      width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
+                      transition: isDragging ? 'none' : 'width 0.1s linear',
+                    }}
+                  />
+                </div>
               </div>
+
+              <audio
+                ref={audioRef}
+                className="hidden"
+                crossOrigin="anonymous"
+                preload="metadata"
+                key={item.audioUrl}
+                onEnded={() => {
+                  setIsPlaying(false)
+                  resetPlayerState(0)
+                  onAudioToggle()
+                }}
+                onError={(e) => {
+                  console.error('Audio playback error:', e)
+                }}
+              >
+                <source src={item.audioUrl} type="audio/mpeg" />
+              </audio>
             </div>
-
-            <audio
-              ref={audioRef}
-              className="hidden"
-              crossOrigin="anonymous"
-              preload="metadata"
-              key={item.audioUrl}
-              onEnded={() => {
-                setIsPlaying(false)
-                resetPlayerState(0)
-                onAudioToggle()
-              }}
-              onError={(e) => {
-                console.error('Audio playback error:', e)
-              }}
-            >
-              <source src={item.audioUrl} type="audio/mpeg" />
-            </audio>
           </div>
-        </div>
-      )
-    }
+        )
+      }
 
-    // Finally fall back to Soundcloud embed if available
-    if (item.soundcloudEmbed) {
-      return (
-        <div
-          className="w-[calc(100%-76px)] ml-[76px] my-4"
-          dangerouslySetInnerHTML={{ __html: item.soundcloudEmbed }}
-        />
-      )
+      // Finally fall back to Soundcloud embed if available
+      if (item.soundcloudEmbed) {
+        return (
+          <div
+            className="w-[calc(100%-76px)] ml-[76px] my-4"
+            dangerouslySetInnerHTML={{ __html: item.soundcloudEmbed }}
+          />
+        )
+      }
     }
 
     return null
@@ -361,7 +374,7 @@ export const ListItem: React.FC<ListItemProps> = ({
           </div>
         ))}
       </div>
-      {hasPlayableContent && isAudioVisible && renderAudioPlayer()}
+      {(hasAudioContent || hasVideoContent) && renderMediaPlayer()}
       {/* Render the hovering image at the document level to avoid containment issues */}
       {hasImage && showImage && (
         <div

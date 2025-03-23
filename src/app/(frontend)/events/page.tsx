@@ -17,6 +17,7 @@ export default async function Page() {
       url: true,
       audioUrl: true,
       soundcloudEmbed: true,
+      videoEmbed: true,
       image: {
         url: true,
         sizes: {
@@ -31,7 +32,8 @@ export default async function Page() {
 
   const columns = [
     { field: 'year', width: '60px' },
-    { field: 'play', width: '100px' },
+    { field: 'play', width: '60px' },
+    { field: 'watch', width: '100px' },
     { field: 'title' },
     { field: 'location' },
     // { field: 'duration', width: '150px' },
@@ -61,6 +63,7 @@ export default async function Page() {
       audioUrl: item.audioUrl || undefined,
       image,
       soundcloudEmbed: item.soundcloudEmbed || undefined,
+      videoEmbed: item.videoEmbed || undefined,
     }
   })
 

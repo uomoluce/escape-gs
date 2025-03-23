@@ -12,7 +12,8 @@ interface ListItemsProps {
 
 export const ListItems = ({ items, columns, collectionType }: ListItemsProps) => {
   // Track which item is currently playing (if any)
-  const [activeItemId, setActiveItemId] = useState<string | null>(null)
+  const [activeAudioId, setActiveAudioId] = useState<string | null>(null)
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null)
 
   return (
     <>
@@ -22,9 +23,21 @@ export const ListItems = ({ items, columns, collectionType }: ListItemsProps) =>
           item={item}
           columns={columns}
           collectionType={collectionType}
-          isAudioVisible={activeItemId === item.id}
+          isAudioVisible={activeAudioId === item.id}
+          isVideoVisible={activeVideoId === item.id}
           onAudioToggle={() => {
-            setActiveItemId(activeItemId === item.id ? null : item.id)
+            setActiveAudioId(activeAudioId === item.id ? null : item.id)
+            // Close video if open
+            if (activeVideoId === item.id) {
+              setActiveVideoId(null)
+            }
+          }}
+          onVideoToggle={() => {
+            setActiveVideoId(activeVideoId === item.id ? null : item.id)
+            // Close audio if open
+            if (activeAudioId === item.id) {
+              setActiveAudioId(null)
+            }
           }}
         />
       ))}
