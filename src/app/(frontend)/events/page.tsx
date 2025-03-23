@@ -15,7 +15,7 @@ export default async function Page() {
       date: true,
       location: true,
       url: true,
-      audio: true,
+      audioUrl: true,
       soundcloudEmbed: true,
       image: {
         url: true,
@@ -39,15 +39,6 @@ export default async function Page() {
 
   // Convert id to string and handle null values
   const items = events?.docs.map((item) => {
-    // Only include audio if both url and mimeType are available
-    const audio =
-      typeof item.audio === 'object' && item.audio?.url && item.audio?.mimeType
-        ? {
-            url: item.audio.url,
-            mimeType: item.audio.mimeType,
-          }
-        : undefined
-
     // Handle image format with proper null checks
     const image =
       typeof item.image === 'object' && item.image?.url
@@ -67,7 +58,7 @@ export default async function Page() {
       year: item.year,
       location: item.location,
       url: item.url || undefined,
-      audio,
+      audioUrl: item.audioUrl || undefined,
       image,
       soundcloudEmbed: item.soundcloudEmbed || undefined,
     }

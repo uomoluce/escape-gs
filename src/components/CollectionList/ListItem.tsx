@@ -23,9 +23,7 @@ export const ListItem: React.FC<ListItemProps> = ({
   const gridTemplateColumns = columns.map((col) => col.width || '1fr').join(' ')
 
   const hasPlayableContent =
-    (item.audio?.mimeType?.startsWith('audio/') && item.audio?.url) ||
-    Boolean(item.soundcloudEmbed) ||
-    Boolean(item.videoEmbed)
+    Boolean(item.audioUrl) || Boolean(item.soundcloudEmbed) || Boolean(item.videoEmbed)
   const hasExternalUrl = Boolean(item.url)
   const hasImage = Boolean(item.image?.url)
 
@@ -77,7 +75,7 @@ export const ListItem: React.FC<ListItemProps> = ({
         audioRef.current.removeEventListener('seeking', updateTime)
       }
     }
-  }, [isAudioVisible, item.audio?.url]) // Add item.audio?.url as dependency to refresh when track changes
+  }, [isAudioVisible, item.audioUrl]) // Add item.audioUrl as dependency to refresh when track changes
 
   useEffect(() => {
     // Immediately reset position display when audio becomes invisible
@@ -166,7 +164,7 @@ export const ListItem: React.FC<ListItemProps> = ({
     if (!hasPlayableContent) return
 
     if (isAudioVisible) {
-      if (item.audio?.mimeType?.startsWith('audio/') && isPlaying) {
+      if (item.audioUrl && isPlaying) {
         audioRef.current?.pause()
         setIsPlaying(false)
       }
@@ -194,7 +192,7 @@ export const ListItem: React.FC<ListItemProps> = ({
         onClick={handlePlayClick}
         className="inline-flex items-center hover:opacity-75 transition-opacity"
       >
-        {isPlaying && isAudioVisible && item.audio?.mimeType?.startsWith('audio/')
+        {isPlaying && isAudioVisible && item.audioUrl
           ? 'PAUSE'
           : item.videoEmbed
             ? 'WATCH'
@@ -237,7 +235,7 @@ export const ListItem: React.FC<ListItemProps> = ({
   }
 
   const renderDuration = () => {
-    if (!item.audio?.mimeType) return item.duration || null
+    if (!item.audioUrl) return item.duration || null
 
     if (isAudioVisible && isPlaying) {
       return (
@@ -258,6 +256,7 @@ export const ListItem: React.FC<ListItemProps> = ({
   }
 
   const renderAudioPlayer = () => {
+    // First check for video embed as it takes precedence
     if (item.videoEmbed) {
       return (
         <div
@@ -267,6 +266,61 @@ export const ListItem: React.FC<ListItemProps> = ({
       )
     }
 
+    // Then prefer our own audio URL if available
+    if (item.audioUrl) {
+      return (
+        <div
+          className="grid gap-y-2 w-[calc(100%-76px)] ml-[76px] mb-4"
+          style={{ gridTemplateColumns }}
+        >
+          <div></div>
+          <div className="col-span-full">
+            <div className="flex items-center">
+              <div
+                ref={progressBarRef}
+                className="flex-grow h-[2px] bg-border cursor-pointer relative group"
+                onClick={handleSeek}
+                onMouseDown={handleMouseDown}
+                aria-label="Audio progress"
+                aria-valuemin={0}
+                aria-valuemax={duration || 100}
+                aria-valuenow={currentTime}
+                aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
+              >
+                {/* Progress fill */}
+                <div
+                  className="absolute top-0 left-0 bottom-0 bg-foreground group-hover:bg-primary transition-colors"
+                  style={{
+                    width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
+                    transition: isDragging ? 'none' : 'width 0.1s linear',
+                  }}
+                />
+              </div>
+            </div>
+
+            <audio
+              ref={audioRef}
+              className="hidden"
+              crossOrigin="anonymous"
+              preload="metadata"
+              key={item.audioUrl}
+              onEnded={() => {
+                setIsPlaying(false)
+                resetPlayerState(0)
+                onAudioToggle()
+              }}
+              onError={(e) => {
+                console.error('Audio playback error:', e)
+              }}
+            >
+              <source src={item.audioUrl} type="audio/mpeg" />
+            </audio>
+          </div>
+        </div>
+      )
+    }
+
+    // Finally fall back to Soundcloud embed if available
     if (item.soundcloudEmbed) {
       return (
         <div
@@ -276,59 +330,7 @@ export const ListItem: React.FC<ListItemProps> = ({
       )
     }
 
-    // Use audio URL directly
-    const audioUrl = item.audio?.url || ''
-
-    return (
-      <div
-        className="grid gap-y-2 w-[calc(100%-76px)] ml-[76px] mb-4"
-        style={{ gridTemplateColumns }}
-      >
-        <div></div>
-        <div className="col-span-full">
-          <div className="flex items-center">
-            <div
-              ref={progressBarRef}
-              className="flex-grow h-[2px] bg-border cursor-pointer relative group"
-              onClick={handleSeek}
-              onMouseDown={handleMouseDown}
-              aria-label="Audio progress"
-              aria-valuemin={0}
-              aria-valuemax={duration || 100}
-              aria-valuenow={currentTime}
-              aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
-            >
-              {/* Progress fill */}
-              <div
-                className="absolute top-0 left-0 bottom-0 bg-foreground group-hover:bg-primary transition-colors"
-                style={{
-                  width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
-                  transition: isDragging ? 'none' : 'width 0.1s linear',
-                }}
-              />
-            </div>
-          </div>
-
-          <audio
-            ref={audioRef}
-            className="hidden"
-            crossOrigin="anonymous"
-            preload="metadata"
-            key={item.audio?.url}
-            onEnded={() => {
-              setIsPlaying(false)
-              resetPlayerState(0)
-              onAudioToggle()
-            }}
-            onError={(e) => {
-              console.error('Audio playback error:', e)
-            }}
-          >
-            <source src={audioUrl} type={item.audio?.mimeType || 'audio/mpeg'} />
-          </audio>
-        </div>
-      </div>
-    )
+    return null
   }
 
   // Add helper function to get the thumbnail URL

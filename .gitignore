@@ -15,3 +15,4 @@ public/sitemap*.xml
 
 # Backup migrations
 src/migrations/backup/
+/backups

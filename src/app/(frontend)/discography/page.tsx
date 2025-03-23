@@ -14,7 +14,7 @@ export default async function Page() {
       label: true,
       type: true,
       url: true,
-      audio: true,
+      audioUrl: true,
       soundcloudEmbed: true,
     },
     sort: '-year',
@@ -29,27 +29,16 @@ export default async function Page() {
   ]
 
   // Convert id to string and handle null values
-  const items = discography?.docs.map((item) => {
-    // Only include audio if both url and mimeType are available
-    const audio =
-      typeof item.audio === 'object' && item.audio?.url && item.audio?.mimeType
-        ? {
-            url: item.audio.url,
-            mimeType: item.audio.mimeType,
-          }
-        : undefined
-
-    return {
-      id: String(item.id),
-      title: item.title,
-      year: item.year,
-      label: item.label,
-      type: item.type,
-      url: item.url || undefined,
-      audio,
-      soundcloudEmbed: item.soundcloudEmbed || undefined,
-    }
-  })
+  const items = discography?.docs.map((item) => ({
+    id: String(item.id),
+    title: item.title,
+    year: item.year,
+    label: item.label,
+    type: item.type,
+    url: item.url || undefined,
+    audioUrl: item.audioUrl || undefined,
+    soundcloudEmbed: item.soundcloudEmbed || undefined,
+  }))
 
   return <CollectionList columns={columns} items={items} collectionType="discography" />
 }

@@ -25,9 +25,7 @@ export const CollectionList = ({
 }: Props) => {
   // Do the audio check on the server
   const hasAudioContent = items.some(
-    (item) =>
-      (item.audio?.mimeType?.startsWith('audio/') && item.audio?.url) ||
-      Boolean(item.soundcloudEmbed),
+    (item) => Boolean(item.audioUrl) || Boolean(item.soundcloudEmbed),
   )
 
   // Filter columns on the server

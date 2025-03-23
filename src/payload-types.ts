@@ -755,9 +755,9 @@ export interface Discography {
   type: string;
   url?: string | null;
   /**
-   * Upload an audio file (MP3)
+   * Direct URL to the audio file (e.g. from AWS)
    */
-  audio?: (number | null) | Media;
+  audioUrl?: string | null;
   /**
    * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
    */
@@ -779,7 +779,10 @@ export interface Mix {
   title: string;
   platform: string;
   url?: string | null;
-  audio?: (number | null) | Media;
+  /**
+   * Direct URL to the audio file (e.g. from AWS)
+   */
+  audioUrl?: string | null;
   /**
    * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
    */
@@ -801,7 +804,10 @@ export interface Event {
   title: string;
   location: string;
   url?: string | null;
-  audio?: (number | null) | Media;
+  /**
+   * Direct URL to the audio file (e.g. from AWS)
+   */
+  audioUrl?: string | null;
   /**
    * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
    */
@@ -834,9 +840,9 @@ export interface Curatorship {
   date: string;
   url?: string | null;
   /**
-   * Upload an audio file (MP3)
+   * Direct URL to the audio file (e.g. from AWS)
    */
-  audio?: (number | null) | Media;
+  audioUrl?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -850,7 +856,10 @@ export interface SoundDesign {
   title: string;
   platform: string;
   url?: string | null;
-  audio?: (number | null) | Media;
+  /**
+   * Direct URL to the audio file (e.g. from AWS)
+   */
+  audioUrl?: string | null;
   /**
    * Paste the Soundcloud embed code here. This will be used instead of the audio player when no audio file is uploaded.
    */
@@ -1441,7 +1450,7 @@ export interface DiscographySelect<T extends boolean = true> {
   label?: T;
   type?: T;
   url?: T;
-  audio?: T;
+  audioUrl?: T;
   soundcloudEmbed?: T;
   videoEmbed?: T;
   updatedAt?: T;
@@ -1456,7 +1465,7 @@ export interface MixesSelect<T extends boolean = true> {
   title?: T;
   platform?: T;
   url?: T;
-  audio?: T;
+  audioUrl?: T;
   soundcloudEmbed?: T;
   videoEmbed?: T;
   updatedAt?: T;
@@ -1471,7 +1480,7 @@ export interface EventsSelect<T extends boolean = true> {
   title?: T;
   location?: T;
   url?: T;
-  audio?: T;
+  audioUrl?: T;
   soundcloudEmbed?: T;
   videoEmbed?: T;
   image?: T;
@@ -1487,7 +1496,7 @@ export interface CuratorshipSelect<T extends boolean = true> {
   role?: T;
   date?: T;
   url?: T;
-  audio?: T;
+  audioUrl?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1500,7 +1509,7 @@ export interface SoundDesignSelect<T extends boolean = true> {
   title?: T;
   platform?: T;
   url?: T;
-  audio?: T;
+  audioUrl?: T;
   soundcloudEmbed?: T;
   videoEmbed?: T;
   updatedAt?: T;
