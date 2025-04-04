@@ -306,7 +306,7 @@ export const ListItem: React.FC<ListItemProps> = ({
         return hasVideoContent ? (
           <button
             onClick={onVideoToggle}
-            className="inline-flex items-center hover:opacity-75 transition-opacity"
+            className="inline-flex items-center hover:opacity-75 transition-opacity text-[11px] text-[#98a1a6] text-opacity-70"
             aria-label={isVideoVisible ? 'Hide video player' : 'Show video player'}
           >
             {isVideoVisible ? 'HIDE' : 'WATCH'}

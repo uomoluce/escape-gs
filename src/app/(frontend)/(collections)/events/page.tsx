@@ -36,8 +36,8 @@ export default async function Page() {
   const columns = [
     { field: 'year', width: '60px' },
     { field: 'play', width: '60px' },
-    { field: 'watch', width: '100px' },
-    { field: 'eventType', width: '20px' },
+    { field: 'watch', width: '60px' },
+    { field: 'eventType', width: '40px' },
     { field: 'title', width: 'minmax(250px, 2fr)' },
     { field: 'location', width: 'minmax(120px, 1fr)' },
     { field: 'duration', width: '150px' },
