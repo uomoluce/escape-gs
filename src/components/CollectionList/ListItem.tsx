@@ -14,6 +14,7 @@ export const ListItem: React.FC<ListItemProps> = ({
   isVideoVisible,
   onAudioToggle,
   onVideoToggle,
+  isFirstOfYear,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
@@ -275,14 +276,27 @@ export const ListItem: React.FC<ListItemProps> = ({
   }
 
   const renderCell = (field: string) => {
+    // Define which fields should be styled as secondary
+    const secondaryFields = ['year', 'eventType', 'location', 'duration', 'type', 'date']
+    const isSecondary = secondaryFields.includes(field)
+
+    // Helper function to get opacity based on event type
+    const getEventTypeOpacity = (type: string) => {
+      const types = ['EP', 'LP', 'REMIX', 'VA', 'COMMISSION']
+      const index = types.indexOf(type.toUpperCase())
+      return index !== -1 ? (index + 2) * 20 : 60 // Default to 60% if type not found
+    }
+
     switch (field) {
       case 'year':
-        return item.year
+        return isFirstOfYear ? (
+          <span className={isSecondary ? 'text-[#98a1a6] text-opacity-70' : ''}>{item.year}</span>
+        ) : null
       case 'play':
         return hasAudioContent ? (
           <button
             onClick={onAudioToggle}
-            className="inline-flex items-center hover:opacity-75 transition-opacity"
+            className="inline-flex items-center hover:opacity-75 transition-opacity text-[11px] text-[#98a1a6] text-opacity-70"
             aria-label={isAudioVisible ? 'Hide audio player' : 'Show audio player'}
           >
             {isAudioVisible ? 'PAUSE' : 'PLAY'}
@@ -325,9 +339,42 @@ export const ListItem: React.FC<ListItemProps> = ({
           </div>
         )
       case 'eventType':
-        return item.eventType
+        if (collectionType === 'events') {
+          return (
+            <span
+              className={`inline-block w-2 h-2 rounded-full bg-[#98a1a6]`}
+              style={{ opacity: getEventTypeOpacity(item.eventType) / 100 }}
+            />
+          )
+        }
+        return (
+          <span className={isSecondary ? 'text-[#98a1a6] text-opacity-70' : ''}>
+            {item.eventType}
+          </span>
+        )
+      case 'duration':
+        if (!hasAudioContent) return null
+        if (item.audioUrl) {
+          if (duration > 0) {
+            if (isAudioVisible && isPlaying) {
+              return (
+                <div className="text-right tabular-nums text-[#98a1a6] text-opacity-70">
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                </div>
+              )
+            }
+            return (
+              <div className="tabular-nums text-right text-[#98a1a6] text-opacity-70">
+                {formatTime(duration)}
+              </div>
+            )
+          }
+        }
+        return <div className="tabular-nums text-right text-[#98a1a6] text-opacity-70">--:--</div>
       default:
-        return item[field]
+        return (
+          <span className={isSecondary ? 'text-[#98a1a6] text-opacity-70' : ''}>{item[field]}</span>
+        )
     }
   }
 

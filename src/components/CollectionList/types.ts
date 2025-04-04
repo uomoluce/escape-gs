@@ -40,4 +40,5 @@ export interface ListItemProps {
   isVideoVisible: boolean
   onAudioToggle: () => void
   onVideoToggle: () => void
+  isFirstOfYear?: boolean
 }

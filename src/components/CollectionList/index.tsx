@@ -38,9 +38,5 @@ export const CollectionList = ({
     return true
   })
 
-  return (
-    <div className="container mb-20">
-      <ListItems items={items} columns={columns} collectionType={collectionType} />
-    </div>
-  )
+  return <ListItems items={items} columns={columns} collectionType={collectionType} />
 }

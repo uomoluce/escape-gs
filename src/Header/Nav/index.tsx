@@ -8,7 +8,7 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
   const navItems = data?.navItems || []
 
   return (
-    <nav className="flex gap-5 items-start">
+    <nav className="flex justify-between gap-5 items-start">
       {navItems.map(({ link }, i) => {
         if (!link?.url) return null
 
@@ -17,7 +17,7 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
             key={i}
             href={link.url}
             target={link.newTab ? '_blank' : undefined}
-            className="nav-link hover:opacity-75 transition-opacity"
+            className="nav-link hover:opacity-75 transition-opacity text-gray-800"
           >
             {link.label}
           </Link>

@@ -21,14 +21,14 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
 
   return (
     <header className="container relative z-20">
-      <div className="pt-8 flex justify-between">
+      <div className="pt-8 pb-1 flex justify-between border-b border-gray-500">
         <>
-          GS <br />
-          B.1991, IT
+          gs <br />
+          b.1991, IT
         </>
-        <ThemeSelector />
+        {/* <ThemeSelector /> */}
       </div>
-      <div className="py-20 flex justify-between">
+      <div className="py-5">
         <HeaderNav data={data} />
       </div>
     </header>

@@ -33,7 +33,11 @@ export default async function Page() {
     url: url || undefined,
   }))
 
-  return <CollectionList columns={columns} items={items} collectionType="curatorship" />
+  return (
+    <>
+      <CollectionList columns={columns} items={items} collectionType="curatorship" />
+    </>
+  )
 }
 
 export function generateMetadata(): Metadata {

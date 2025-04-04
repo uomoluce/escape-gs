@@ -43,7 +43,11 @@ export default async function Page() {
     videoEmbed: item.videoEmbed || undefined,
   }))
 
-  return <CollectionList columns={columns} items={items} collectionType="discography" />
+  return (
+    <>
+      <CollectionList columns={columns} items={items} collectionType="discography" />
+    </>
+  )
 }
 
 export function generateMetadata(): Metadata {

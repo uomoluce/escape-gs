@@ -28,7 +28,7 @@ export default async function Page() {
     { field: 'watch', width: '100px' },
     { field: 'title', width: 'minmax(250px, 2fr)' },
     { field: 'platform', width: 'minmax(120px, 1fr)' },
-    // { field: 'duration', width: '150px' },
+    { field: 'duration', width: '150px' },
   ]
 
   // Convert id to string and handle null values
@@ -43,7 +43,11 @@ export default async function Page() {
     videoEmbed: item.videoEmbed || undefined,
   }))
 
-  return <CollectionList columns={columns} items={items} collectionType="sound-design" />
+  return (
+    <>
+      <CollectionList columns={columns} items={items} collectionType="sound-design" />
+    </>
+  )
 }
 
 export function generateMetadata(): Metadata {

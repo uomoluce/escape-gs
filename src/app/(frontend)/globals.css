@@ -18,6 +18,8 @@
     width: 95% !important;
     margin-left: auto;
     margin-right: auto;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   /* Switch to fixed width only at 2xl */
@@ -81,7 +83,7 @@
 
     --font-sans: Arial, 'Atlas Grotesk', system-ui, sans-serif;
     --font-serif: 'Times', 'Times New Roman', serif;
-    --font-size-base: 16px;
+    --font-size-base: 13px;
     --line-height-base: 1.5;
     --letter-spacing: 0.02em;
   }
@@ -128,7 +130,7 @@
   html,
   body {
     @apply bg-background text-foreground min-h-[100vh] flex flex-col;
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     font-size: var(--font-size-base);
     line-height: var(--line-height-base);
     letter-spacing: var(--letter-spacing);
@@ -141,15 +143,17 @@
 
   /* Simple, direct styling for navigation links */
   .nav-link {
-    color: black; /* Default color for light mode */
+    color: #98a1a6; /* Dark grey color for both modes */
+    text-transform: uppercase;
+    font-family: var(--font-sans);
+    font-size: 11px;
   }
 
   [data-theme='dark'] .nav-link {
-    color: white; /* Color for dark mode */
+    color: #98a1a6; /* Same dark grey color in dark mode */
   }
 
   button {
-    font-family: var(--font-serif);
     @apply bg-transparent border-0 cursor-pointer text-inherit p-0;
   }
 }
