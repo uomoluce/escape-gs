@@ -478,7 +478,10 @@ export const ListItem: React.FC<ListItemProps> = ({
 
   return (
     <div className="contents">
-      <div className="grid gap-x-4 items-start w-full" style={{ gridTemplateColumns }}>
+      <div
+        className="grid items-start w-full border-b border-transparent hover:bg-[rgba(152,161,166,0.05)] hover:border-[#98a1a6] hover:border-opacity-20"
+        style={{ gridTemplateColumns }}
+      >
         {columns.map(({ field }, index) => (
           <div
             key={field}
@@ -504,7 +507,7 @@ export const ListItem: React.FC<ListItemProps> = ({
             alt={item.title || 'Event image'}
             width={300}
             height={200}
-            className="object-contain max-w-[300px] max-h-[200px] w-auto h-auto"
+            className="object-contain max-w-[300px] max-h-[200px] w-auto h-auto mix-blend-difference"
             style={{
               width: 'auto',
               height: 'auto',
