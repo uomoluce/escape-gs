@@ -94,14 +94,24 @@ export default async function Page() {
   return (
     <>
       <div className="flex justify-between py-1">
-        {eventTypes.map(([type, label], index) => (
-          <div key={type} className="flex items-center gap-2">
-            <span
-              className={`inline-block w-2 h-2 rounded-full bg-[#98a1a6] opacity-${(index + 2) * 20}`}
-            />
-            <span className="text-[11px] text-[#98a1a6] text-opacity-70 uppercase">{label}</span>
-          </div>
-        ))}
+        {eventTypes.map(([type, label], index) => {
+          // Custom opacity values for each type
+          const opacityMap: Record<string, number> = {
+            n_a: 0.2, // 20% opacity (brightest)
+            residency: 0.4, // 40% opacity
+            live: 0.8, // 80% opacity
+            dj_set: 1.0, // 100% opacity (darkest)
+          }
+          return (
+            <div key={type} className="flex items-center gap-2">
+              <span
+                className="inline-block w-2 h-2 rounded-full bg-[#98a1a6]"
+                style={{ opacity: opacityMap[type] }}
+              />
+              <span className="text-[11px] text-[#98a1a6] text-opacity-70 uppercase">{label}</span>
+            </div>
+          )
+        })}
       </div>
       <div className="py-5">
         <CollectionList items={items} columns={columns} collectionType="events" />

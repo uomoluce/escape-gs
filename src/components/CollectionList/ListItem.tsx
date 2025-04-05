@@ -295,11 +295,24 @@ export const ListItem: React.FC<ListItemProps> = ({
       case 'play':
         return hasAudioContent ? (
           <button
-            onClick={onAudioToggle}
+            onClick={() => {
+              if (isAudioVisible) {
+                if (isPlaying) {
+                  audioRef.current?.pause()
+                  setIsPlaying(false)
+                } else if (audioRef.current) {
+                  audioRef.current.play()
+                  setIsPlaying(true)
+                }
+              }
+              onAudioToggle()
+            }}
             className="inline-flex items-center hover:opacity-75 transition-opacity text-[11px] text-[#98a1a6] text-opacity-70"
-            aria-label={isAudioVisible ? 'Hide audio player' : 'Show audio player'}
+            aria-label={
+              isAudioVisible ? (isPlaying ? 'Pause audio' : 'Play audio') : 'Show audio player'
+            }
           >
-            {isAudioVisible ? 'PAUSE' : 'PLAY'}
+            {isAudioVisible ? (isPlaying ? 'PAUSE' : 'PLAY') : 'PLAY'}
           </button>
         ) : null
       case 'watch':
@@ -340,11 +353,16 @@ export const ListItem: React.FC<ListItemProps> = ({
         )
       case 'eventType':
         if (collectionType === 'events') {
+          // Custom opacity values for each type
+          const opacityMap: Record<string, number> = {
+            n_a: 0.2, // 20% opacity (brightest)
+            residency: 0.4, // 40% opacity
+            live: 0.8, // 80% opacity
+            dj_set: 1.0, // 100% opacity (darkest)
+          }
+          const opacity = opacityMap[item.eventType?.toLowerCase() || ''] || 0.6
           return (
-            <span
-              className={`inline-block w-2 h-2 rounded-full bg-[#98a1a6]`}
-              style={{ opacity: getEventTypeOpacity(item.eventType) / 100 }}
-            />
+            <span className="inline-block w-2 h-2 rounded-full bg-[#98a1a6]" style={{ opacity }} />
           )
         }
         return (
@@ -382,7 +400,7 @@ export const ListItem: React.FC<ListItemProps> = ({
     if (isVideoVisible && item.videoEmbed) {
       return (
         <div
-          className="w-[calc(100%-76px)] ml-[76px] my-4"
+          className="w-[calc(100%-120px)] ml-[120px] my-4"
           dangerouslySetInnerHTML={{ __html: item.videoEmbed }}
         />
       )
@@ -393,7 +411,7 @@ export const ListItem: React.FC<ListItemProps> = ({
       if (item.audioUrl) {
         return (
           <div
-            className="grid gap-y-2 w-[calc(100%-76px)] ml-[76px] mb-4"
+            className="grid gap-y-2 w-[calc(100%-60px)] ml-[60px] mb-4"
             style={{ gridTemplateColumns }}
           >
             <div></div>
@@ -424,7 +442,6 @@ export const ListItem: React.FC<ListItemProps> = ({
               <audio
                 ref={audioRef}
                 className="hidden"
-                crossOrigin="anonymous"
                 preload="metadata"
                 key={item.audioUrl}
                 onLoadedMetadata={(e) => {
@@ -438,6 +455,7 @@ export const ListItem: React.FC<ListItemProps> = ({
                 }}
                 onError={(e) => {
                   console.error('Audio playback error:', e)
+                  setIsPlaying(false)
                 }}
                 src={item.audioUrl}
               />
@@ -450,7 +468,7 @@ export const ListItem: React.FC<ListItemProps> = ({
       if (item.soundcloudEmbed) {
         return (
           <div
-            className="w-[calc(100%-76px)] ml-[76px] my-4"
+            className="w-[calc(100%-60px)] ml-[60px] my-4"
             dangerouslySetInnerHTML={{ __html: item.soundcloudEmbed }}
           />
         )

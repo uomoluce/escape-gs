@@ -144,14 +144,15 @@
 
   /* Simple, direct styling for navigation links */
   .nav-link {
-    color: #98a1a6; /* Dark grey color for both modes */
     text-transform: uppercase;
     font-family: var(--font-sans);
     font-size: 11px;
   }
 
   [data-theme='dark'] .nav-link {
-    color: #98a1a6; /* Same dark grey color in dark mode */
+    text-transform: uppercase;
+    font-family: var(--font-sans);
+    font-size: 11px;
   }
 
   button {

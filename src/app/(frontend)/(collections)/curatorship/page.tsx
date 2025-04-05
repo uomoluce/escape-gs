@@ -15,6 +15,7 @@ export default async function Page() {
       role: true,
       url: true,
     },
+    sort: '-date',
   })
 
   const columns = [
