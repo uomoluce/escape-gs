@@ -289,9 +289,16 @@ export const ListItem: React.FC<ListItemProps> = ({
 
     switch (field) {
       case 'year':
-        return isFirstOfYear ? (
-          <span className={isSecondary ? 'text-[var(--secondary-text)]' : ''}>{item.year}</span>
-        ) : null
+        return (
+          <>
+            {/* Mobile view - always show year */}
+            <span className="md:hidden text-[var(--secondary-text)]">{item.year}</span>
+            {/* Desktop view - only show first of year */}
+            <span className="hidden md:inline text-[var(--secondary-text)]">
+              {isFirstOfYear ? item.year : null}
+            </span>
+          </>
+        )
       case 'play':
         return hasAudioContent ? (
           <button
@@ -413,7 +420,7 @@ export const ListItem: React.FC<ListItemProps> = ({
     if (isVideoVisible && item.videoEmbed) {
       return (
         <div
-          className="w-[calc(100%-120px)] ml-[120px] my-4"
+          className="w-full md:w-[calc(100%-120px)] md:ml-[120px] my-4"
           dangerouslySetInnerHTML={{ __html: item.videoEmbed }}
         />
       )
@@ -423,56 +430,50 @@ export const ListItem: React.FC<ListItemProps> = ({
       // Then prefer our own audio URL if available
       if (item.audioUrl) {
         return (
-          <div
-            className="grid gap-y-2 w-[calc(100%-60px)] ml-[60px] mb-4"
-            style={{ gridTemplateColumns }}
-          >
-            <div></div>
-            <div className="col-span-full">
-              <div className="flex items-center">
+          <div className="w-full md:w-[calc(100%-60px)] md:ml-[60px] mb-4">
+            <div className="flex items-center">
+              <div
+                ref={progressBarRef}
+                className="flex-grow h-[2px] bg-border cursor-pointer relative group"
+                onClick={handleSeek}
+                onMouseDown={handleMouseDown}
+                aria-label="Audio progress"
+                aria-valuemin={0}
+                aria-valuemax={duration || 100}
+                aria-valuenow={currentTime}
+                aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
+              >
+                {/* Progress fill */}
                 <div
-                  ref={progressBarRef}
-                  className="flex-grow h-[2px] bg-border cursor-pointer relative group"
-                  onClick={handleSeek}
-                  onMouseDown={handleMouseDown}
-                  aria-label="Audio progress"
-                  aria-valuemin={0}
-                  aria-valuemax={duration || 100}
-                  aria-valuenow={currentTime}
-                  aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
-                >
-                  {/* Progress fill */}
-                  <div
-                    className="absolute top-0 left-0 bottom-0 bg-foreground group-hover:bg-primary transition-colors"
-                    style={{
-                      width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
-                      transition: isDragging ? 'none' : 'width 0.1s linear',
-                    }}
-                  />
-                </div>
+                  className="absolute top-0 left-0 bottom-0 bg-foreground group-hover:bg-primary transition-colors"
+                  style={{
+                    width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
+                    transition: isDragging ? 'none' : 'width 0.1s linear',
+                  }}
+                />
               </div>
-
-              <audio
-                ref={audioRef}
-                className="hidden"
-                preload="metadata"
-                key={item.audioUrl}
-                onLoadedMetadata={(e) => {
-                  const audio = e.target as HTMLAudioElement
-                  setDuration(audio.duration)
-                }}
-                onEnded={() => {
-                  setIsPlaying(false)
-                  resetPlayerState(0)
-                  onAudioToggle()
-                }}
-                onError={(e) => {
-                  console.error('Audio playback error:', e)
-                  setIsPlaying(false)
-                }}
-                src={item.audioUrl}
-              />
             </div>
+
+            <audio
+              ref={audioRef}
+              className="hidden"
+              preload="metadata"
+              key={item.audioUrl}
+              onLoadedMetadata={(e) => {
+                const audio = e.target as HTMLAudioElement
+                setDuration(audio.duration)
+              }}
+              onEnded={() => {
+                setIsPlaying(false)
+                resetPlayerState(0)
+                onAudioToggle()
+              }}
+              onError={(e) => {
+                console.error('Audio playback error:', e)
+                setIsPlaying(false)
+              }}
+              src={item.audioUrl}
+            />
           </div>
         )
       }
@@ -481,7 +482,7 @@ export const ListItem: React.FC<ListItemProps> = ({
       if (item.soundcloudEmbed) {
         return (
           <div
-            className="w-[calc(100%-60px)] ml-[60px] my-4"
+            className="w-full md:w-[calc(100%-60px)] md:ml-[60px] my-4"
             dangerouslySetInnerHTML={{ __html: item.soundcloudEmbed }}
           />
         )
@@ -509,8 +510,102 @@ export const ListItem: React.FC<ListItemProps> = ({
 
   return (
     <div className="contents">
+      {/* Mobile view - single column */}
+      <div className="md:hidden flex flex-col gap-1 py-4">
+        {/* Render title and event type together */}
+        <div className="flex items-center gap-1">
+          {columns
+            .filter(({ field }) => field === 'title')
+            .map(({ field }) => (
+              <div key={field} className={`${field.toLowerCase()} flex items-center gap-1`}>
+                {renderCell(field)}
+              </div>
+            ))}
+          {columns
+            .filter(({ field }) => field === 'eventType')
+            .map(({ field }) => (
+              <div key={field} className={`${field.toLowerCase()} flex items-center`}>
+                {renderCell(field)}
+              </div>
+            ))}
+        </div>
+        {/* Render other columns except play/watch, duration, and eventType */}
+        {columns
+          .filter(({ field }) => {
+            // Always filter out play/watch, title (already rendered), duration (will be rendered last), and eventType (rendered with title)
+            if (['play', 'watch', 'title', 'duration', 'eventType'].includes(field)) return false
+            // Filter out date for events
+            if (field === 'date' && collectionType === 'events') return false
+            return true
+          })
+          .map(({ field }) => (
+            <div key={field} className={`${field.toLowerCase()} flex items-center gap-1`}>
+              <span className="text-[11px] text-[var(--secondary-text)] text-opacity-70">
+                {field === 'eventType' ? 'Type' : field.charAt(0).toUpperCase() + field.slice(1)}:
+              </span>
+              {renderCell(field)}
+            </div>
+          ))}
+        {/* Only show play/watch buttons if there's content */}
+        {(hasAudioContent || hasVideoContent) && (
+          <div className="flex items-center gap-4">
+            {hasAudioContent && (
+              <button
+                onClick={handlePlayClick}
+                className="flex items-center gap-1 hover:opacity-75 transition-opacity"
+                aria-label={
+                  isAudioVisible ? (isPlaying ? 'Pause audio' : 'Play audio') : 'Show audio player'
+                }
+              >
+                {isAudioVisible ? (
+                  isPlaying ? (
+                    <PauseIcon className="w-4 h-4 text-[var(--secondary-text)]" />
+                  ) : (
+                    <PlayIcon className="w-4 h-4 text-[var(--secondary-text)]" />
+                  )
+                ) : (
+                  <PlayIcon className="w-4 h-4 text-[var(--secondary-text)]" />
+                )}
+                <span className="text-[11px] text-[var(--secondary-text)] text-opacity-70">
+                  {isAudioVisible ? (isPlaying ? 'PAUSE' : 'PLAY') : 'PLAY'}
+                </span>
+              </button>
+            )}
+            {hasVideoContent && (
+              <button
+                onClick={onVideoToggle}
+                className="flex items-center gap-1 hover:opacity-75 transition-opacity"
+                aria-label={isVideoVisible ? 'Hide video player' : 'Show video player'}
+              >
+                {isVideoVisible ? (
+                  <PauseIcon className="w-4 h-4 text-[var(--secondary-text)]" />
+                ) : (
+                  <PlayIcon className="w-4 h-4 text-[var(--secondary-text)]" />
+                )}
+                <span className="text-[11px] text-[var(--secondary-text)] text-opacity-70">
+                  {isVideoVisible ? 'HIDE' : 'WATCH'}
+                </span>
+              </button>
+            )}
+          </div>
+        )}
+        {/* Render duration last if there's audio content */}
+        {hasAudioContent && (
+          <div className="flex items-center gap-1 justify-end">
+            <span className="text-[11px] text-[var(--secondary-text)] text-opacity-70">
+              Duration:
+            </span>
+            {renderCell('duration')}
+          </div>
+        )}
+        {/* Render media player in mobile view */}
+        {(hasAudioContent || hasVideoContent) && renderMediaPlayer()}
+      </div>
+      <div className="md:hidden border-b border-[var(--border-color)] border-opacity-20 hover:bg-[rgba(152,161,166,0.05)]" />
+
+      {/* Desktop view - grid */}
       <div
-        className="grid items-start w-full border-b border-transparent hover:bg-[rgba(152,161,166,0.05)] hover:border-[#98a1a6] hover:border-opacity-20"
+        className="hidden md:grid items-start w-full border-b border-transparent hover:bg-[rgba(152,161,166,0.05)] hover:border-[#98a1a6] hover:border-opacity-20"
         style={{ gridTemplateColumns }}
       >
         {columns.map(({ field }, index) => (
@@ -522,7 +617,11 @@ export const ListItem: React.FC<ListItemProps> = ({
           </div>
         ))}
       </div>
-      {(hasAudioContent || hasVideoContent) && renderMediaPlayer()}
+      {/* Render media player in desktop view */}
+      <div className="hidden md:block">
+        {(hasAudioContent || hasVideoContent) && renderMediaPlayer()}
+      </div>
+
       {/* Render the hovering image at the document level to avoid containment issues */}
       {hasImage && showImage && (
         <div

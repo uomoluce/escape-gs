@@ -10,7 +10,7 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
   const pathname = usePathname()
 
   return (
-    <nav className="flex justify-between gap-5 items-start">
+    <nav className="flex flex-col sm:flex-row justify-between gap-1 sm:gap-5 items-start">
       {navItems.map(({ link }, i) => {
         if (!link?.url) return null
 
