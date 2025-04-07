@@ -1,9 +1,10 @@
 import type { Metadata } from 'next/types'
 import React from 'react'
-import { CollectionList } from '@/components/CollectionList'
 import { getPayloadData } from '@/lib/payload-utils'
 import type { Media } from '@/payload-types'
 import type { Item } from '@/components/CollectionList/types'
+import { EventsPage } from './page.client'
+import { CollectionList } from '@/components/CollectionList'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -33,92 +34,46 @@ export default async function Page() {
     sort: '-year',
   })
 
+  // Define columns for the collection list
   const columns = [
     { field: 'year', width: '60px' },
+    { field: 'eventType', width: '60px' },
+    { field: 'title', width: '1fr' },
+    { field: 'location', width: '1fr' },
+    { field: 'date', width: '120px' },
     { field: 'play', width: '60px' },
     { field: 'watch', width: '60px' },
-    { field: 'eventType', width: '40px' },
-    { field: 'title', width: 'minmax(250px, 2fr)' },
-    { field: 'location', width: 'minmax(120px, 1fr)' },
-    { field: 'duration', width: '150px' },
   ]
 
-  // Define all possible event types and their labels
-  const eventTypeLabels: Record<string, string> = {
-    dj_set: 'dj_set',
-    live: 'live',
-    residency: 'residency',
-    n_a: 'n_a',
-  }
-
-  // Get unique event types and ensure all types are included
-  const eventTypes = Object.entries(eventTypeLabels)
-
   const items: Item[] =
-    events?.docs.map((item) => {
-      const imageUrl =
-        item.image && typeof item.image === 'object' ? (item.image as Media).url : null
-      const thumbnailUrl =
-        item.image && typeof item.image === 'object'
-          ? (item.image as Media).sizes?.thumbnail?.url
-          : null
-
-      const imageData = imageUrl
+    events?.docs.map((item: any) => ({
+      id: String(item.id),
+      title: item.title,
+      year: item.year,
+      eventType: item.eventType,
+      location: item.location,
+      url: item.url || undefined,
+      audioUrl: item.audioUrl || undefined,
+      soundcloudEmbed: item.soundcloudEmbed || undefined,
+      videoEmbed: item.videoEmbed || undefined,
+      image: item.image
         ? {
-            url: imageUrl,
-            sizes: thumbnailUrl
+            url: item.image.url,
+            sizes: item.image.sizes?.thumbnail
               ? {
                   thumbnail: {
-                    url: thumbnailUrl,
+                    url: item.image.sizes.thumbnail.url,
                   },
                 }
               : undefined,
-            thumbnailURL: thumbnailUrl || undefined,
           }
-        : null
-
-      return {
-        id: String(item.id),
-        title: item.title,
-        year: item.year,
-        eventType: item.eventType,
-        location: item.location,
-        url: item.url || undefined,
-        audioUrl: item.audioUrl || undefined,
-        soundcloudEmbed: item.soundcloudEmbed || undefined,
-        videoEmbed: item.videoEmbed || undefined,
-        image: imageData,
-      }
-    }) || []
+        : null,
+    })) || []
 
   return (
-    <>
-      <div className="flex justify-between py-1">
-        {eventTypes.map(([type, label], index) => {
-          // Custom opacity values for each type
-          const opacityMap: Record<string, number> = {
-            n_a: 0.2,
-            residency: 0.4,
-            live: 1.0,
-            dj_set: 1.0,
-          }
-          return (
-            <div key={type} className="flex items-center gap-2">
-              <span
-                className={`inline-block w-2 h-2 rounded-full bg-[var(--accent-color)] ${
-                  type === 'live' ? 'border border-[var(--accent-color)] bg-transparent' : ''
-                }`}
-                style={{ opacity: opacityMap[type] }}
-              />
-              <span className="text-[11px] text-[var(--secondary-text)] uppercase">{label}</span>
-            </div>
-          )
-        })}
-      </div>
-      <div className="py-5">
-        <CollectionList items={items} columns={columns} collectionType="events" />
-      </div>
-    </>
+    <EventsPage>
+      <CollectionList items={items} columns={columns} collectionType="events" />
+    </EventsPage>
   )
 }
 
