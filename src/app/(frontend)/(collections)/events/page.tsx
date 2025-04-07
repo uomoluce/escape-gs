@@ -37,12 +37,11 @@ export default async function Page() {
   // Define columns for the collection list
   const columns = [
     { field: 'year', width: '60px' },
+    { field: 'play', width: '60px' },
+    { field: 'watch', width: '70px' },
     { field: 'eventType', width: '60px' },
     { field: 'title', width: '1fr' },
     { field: 'location', width: '1fr' },
-    { field: 'date', width: '120px' },
-    { field: 'play', width: '60px' },
-    { field: 'watch', width: '60px' },
   ]
 
   const items: Item[] =
