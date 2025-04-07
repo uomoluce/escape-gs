@@ -21,11 +21,7 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
             key={i}
             href={link.url}
             target={link.newTab ? '_blank' : undefined}
-            className={`nav-link hover:opacity-75 transition-opacity ${
-              isActive
-                ? '!text-[#c0c0c0] underline underline-offset-4'
-                : 'text-[#b8c0c5] text-opacity-70'
-            }`}
+            className={`nav-link hover:opacity-75 transition-opacity ${isActive ? 'active' : ''}`}
           >
             {link.label}
           </Link>

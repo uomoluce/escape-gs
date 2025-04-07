@@ -97,18 +97,20 @@ export default async function Page() {
         {eventTypes.map(([type, label], index) => {
           // Custom opacity values for each type
           const opacityMap: Record<string, number> = {
-            n_a: 0.2, // 20% opacity (brightest)
-            residency: 0.4, // 40% opacity
-            live: 0.8, // 80% opacity
-            dj_set: 1.0, // 100% opacity (darkest)
+            n_a: 0.2,
+            residency: 0.4,
+            live: 1.0,
+            dj_set: 1.0,
           }
           return (
             <div key={type} className="flex items-center gap-2">
               <span
-                className="inline-block w-2 h-2 rounded-full bg-[#98a1a6]"
+                className={`inline-block w-2 h-2 rounded-full bg-[var(--accent-color)] ${
+                  type === 'live' ? 'border border-[var(--accent-color)] bg-transparent' : ''
+                }`}
                 style={{ opacity: opacityMap[type] }}
               />
-              <span className="text-[11px] text-[#98a1a6] text-opacity-70 uppercase">{label}</span>
+              <span className="text-[11px] text-[var(--secondary-text)] uppercase">{label}</span>
             </div>
           )
         })}

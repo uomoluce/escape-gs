@@ -21,7 +21,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
 
   return (
     <header className="container relative z-20">
-      <div className="pt-8 pb-1 flex justify-between border-b border-gray-500">
+      <div className="pt-8 pb-1 flex justify-between border-b border-[var(--border-color)] text-[var(--secondary-text)] dark:text-white">
         <>
           gs <br />
           b.1991, IT

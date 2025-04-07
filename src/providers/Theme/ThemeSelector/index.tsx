@@ -11,7 +11,7 @@ import { Moon, Sun } from 'lucide-react'
 export const ThemeSelector: React.FC = () => {
   const { theme, setTheme } = useTheme()
   const [isMounted, setIsMounted] = useState(false)
-  
+
   useEffect(() => {
     setIsMounted(true)
   }, [])
@@ -42,7 +42,7 @@ export const ThemeSelector: React.FC = () => {
       className="p-0 bg-transparent border-0 cursor-pointer"
       aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
     >
-      {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+      {theme === 'light' ? '☽' : '☼'}
     </button>
   )
 }

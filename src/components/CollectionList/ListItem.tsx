@@ -290,7 +290,7 @@ export const ListItem: React.FC<ListItemProps> = ({
     switch (field) {
       case 'year':
         return isFirstOfYear ? (
-          <span className={isSecondary ? 'text-[#98a1a6] text-opacity-70' : ''}>{item.year}</span>
+          <span className={isSecondary ? 'text-[var(--secondary-text)]' : ''}>{item.year}</span>
         ) : null
       case 'play':
         return hasAudioContent ? (
@@ -307,7 +307,7 @@ export const ListItem: React.FC<ListItemProps> = ({
               }
               onAudioToggle()
             }}
-            className="inline-flex items-center hover:opacity-75 transition-opacity text-[11px] text-[#98a1a6] text-opacity-70"
+            className="inline-flex items-center hover:opacity-75 transition-opacity text-[11px] text-[var(--secondary-text)] text-opacity-70"
             aria-label={
               isAudioVisible ? (isPlaying ? 'Pause audio' : 'Play audio') : 'Show audio player'
             }
@@ -319,7 +319,7 @@ export const ListItem: React.FC<ListItemProps> = ({
         return hasVideoContent ? (
           <button
             onClick={onVideoToggle}
-            className="inline-flex items-center hover:opacity-75 transition-opacity text-[11px] text-[#98a1a6] text-opacity-70"
+            className="inline-flex items-center hover:opacity-75 transition-opacity text-[11px] text-[var(--secondary-text)] text-opacity-70"
             aria-label={isVideoVisible ? 'Hide video player' : 'Show video player'}
           >
             {isVideoVisible ? 'HIDE' : 'WATCH'}
@@ -355,18 +355,25 @@ export const ListItem: React.FC<ListItemProps> = ({
         if (collectionType === 'events') {
           // Custom opacity values for each type
           const opacityMap: Record<string, number> = {
-            n_a: 0.2, // 20% opacity (brightest)
-            residency: 0.4, // 40% opacity
-            live: 0.8, // 80% opacity
-            dj_set: 1.0, // 100% opacity (darkest)
+            n_a: 0.2,
+            residency: 0.4,
+            live: 1.0,
+            dj_set: 1.0,
           }
           const opacity = opacityMap[item.eventType?.toLowerCase() || ''] || 0.6
           return (
-            <span className="inline-block w-2 h-2 rounded-full bg-[#98a1a6]" style={{ opacity }} />
+            <span
+              className={`inline-block w-2 h-2 rounded-full bg-[var(--accent-color)]  ${
+                item.eventType?.toLowerCase() === 'live'
+                  ? 'border border-[var(--accent-color)] bg-transparent'
+                  : ''
+              }`}
+              style={{ opacity }}
+            />
           )
         }
         return (
-          <span className={isSecondary ? 'text-[#98a1a6] text-opacity-70' : ''}>
+          <span className={isSecondary ? 'text-[var(--secondary-text)] text-opacity-70' : ''}>
             {item.eventType}
           </span>
         )
@@ -376,22 +383,28 @@ export const ListItem: React.FC<ListItemProps> = ({
           if (duration > 0) {
             if (isAudioVisible && isPlaying) {
               return (
-                <div className="text-right tabular-nums text-[#98a1a6] text-opacity-70">
+                <div className="text-right tabular-nums text-[var(--secondary-text)] text-opacity-70">
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </div>
               )
             }
             return (
-              <div className="tabular-nums text-right text-[#98a1a6] text-opacity-70">
+              <div className="tabular-nums text-right text-[var(--secondary-text)] text-opacity-70">
                 {formatTime(duration)}
               </div>
             )
           }
         }
-        return <div className="tabular-nums text-right text-[#98a1a6] text-opacity-70">--:--</div>
+        return (
+          <div className="tabular-nums text-right text-[var(--secondary-text)] text-opacity-70">
+            --:--
+          </div>
+        )
       default:
         return (
-          <span className={isSecondary ? 'text-[#98a1a6] text-opacity-70' : ''}>{item[field]}</span>
+          <span className={isSecondary ? 'text-[var(--secondary-text)] text-opacity-70' : ''}>
+            {item[field]}
+          </span>
         )
     }
   }

@@ -43,12 +43,12 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Check for user's stored preference
     const preference = window.localStorage.getItem(themeLocalStorageKey)
-    
+
     // If valid preference exists, use it
     if (themeIsValid(preference)) {
       setThemeState(preference)
       document.documentElement.setAttribute('data-theme', preference)
-    } 
+    }
     // Otherwise set the default theme (dark)
     else {
       setThemeState(defaultTheme)
@@ -57,11 +57,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [])
 
-  return (
-    <ThemeContext.Provider value={{ setTheme, theme }}>
-      {children}
-    </ThemeContext.Provider>
-  )
+  return <ThemeContext.Provider value={{ setTheme, theme }}>{children}</ThemeContext.Provider>
 }
 
 export const useTheme = (): ThemeContextType => useContext(ThemeContext)
