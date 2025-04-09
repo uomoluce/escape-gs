@@ -1,3 +1,4 @@
+import React from 'react'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
 import { EmbedBlock } from '@/blocks/Embed/Component'
 import {
@@ -13,20 +14,24 @@ import {
 } from '@payloadcms/richtext-lexical/react'
 
 import type {
-  CallToActionBlock as CTABlockProps,
   MediaBlock as MediaBlockProps,
+  ContentBlock as ContentBlockProps,
+  FormBlock as FormBlockProps,
 } from '@/payload-types'
-import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { cn } from '@/utilities/ui'
+import { ContentBlock } from '@/blocks/Content/Component'
+import { FormBlock } from '@/blocks/Form/Component'
 
-type NodeTypes =
-  | DefaultNodeTypes
-  | SerializedBlockNode<CTABlockProps | MediaBlockProps | { html: string }>
+type NodeTypes = DefaultNodeTypes | SerializedBlockNode<MediaBlockProps | { html: string }>
 
 type EmbedNode = {
   fields: {
     html: string
   }
+}
+
+type BlockNode<T> = {
+  fields: T
 }
 
 const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
@@ -42,7 +47,7 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) 
   ...defaultConverters,
   ...LinkJSXConverter({ internalDocToHref }),
   blocks: {
-    mediaBlock: ({ node }) => (
+    mediaBlock: ({ node }: { node: BlockNode<MediaBlockProps> }) => (
       <MediaBlock
         className="col-start-1 col-span-3"
         imgClassName="m-0"
@@ -52,10 +57,26 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) 
         disableInnerContainer={true}
       />
     ),
-    cta: ({ node }) => <CallToActionBlock {...node.fields} />,
     embed: ({ node }: { node: EmbedNode }) => (
       <EmbedBlock className="col-start-1" {...node.fields} />
     ),
+    content: ({ node }: { node: BlockNode<ContentBlockProps> }) => (
+      <ContentBlock {...node.fields} />
+    ),
+    formBlock: ({ node }: { node: BlockNode<FormBlockProps> }) => {
+      const { id, blockName, enableIntro, introContent, form, ...otherFields } = node.fields
+
+      return (
+        <FormBlock
+          id={id || undefined}
+          blockName={blockName || undefined}
+          enableIntro={enableIntro || false}
+          introContent={introContent || undefined}
+          form={form as any}
+          {...otherFields}
+        />
+      )
+    },
   },
 })
 

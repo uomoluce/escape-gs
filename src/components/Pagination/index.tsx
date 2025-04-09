@@ -29,20 +29,19 @@ export const Pagination: React.FC<{
   return (
     <div className={cn('my-12', className)}>
       <PaginationComponent>
-        <PaginationContent className="text-[var(--secondary-text)]">
+        <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
               disabled={!hasPrevPage}
               onClick={() => {
                 router.push(`/posts/page/${page - 1}`)
               }}
-              className="text-[11px]"
             />
           </PaginationItem>
 
           {hasExtraPrevPages && (
             <PaginationItem>
-              <PaginationEllipsis className="text-[11px]" />
+              <PaginationEllipsis />
             </PaginationItem>
           )}
 
@@ -52,7 +51,6 @@ export const Pagination: React.FC<{
                 onClick={() => {
                   router.push(`/posts/page/${page - 1}`)
                 }}
-                className="text-[11px]"
               >
                 {page - 1}
               </PaginationLink>
@@ -65,7 +63,6 @@ export const Pagination: React.FC<{
               onClick={() => {
                 router.push(`/posts/page/${page}`)
               }}
-              className="text-[11px]"
             >
               {page}
             </PaginationLink>
@@ -77,7 +74,6 @@ export const Pagination: React.FC<{
                 onClick={() => {
                   router.push(`/posts/page/${page + 1}`)
                 }}
-                className="text-[11px]"
               >
                 {page + 1}
               </PaginationLink>
@@ -86,7 +82,7 @@ export const Pagination: React.FC<{
 
           {hasExtraNextPages && (
             <PaginationItem>
-              <PaginationEllipsis className="text-[11px]" />
+              <PaginationEllipsis />
             </PaginationItem>
           )}
 
@@ -96,7 +92,6 @@ export const Pagination: React.FC<{
               onClick={() => {
                 router.push(`/posts/page/${page + 1}`)
               }}
-              className="text-[11px]"
             />
           </PaginationItem>
         </PaginationContent>
