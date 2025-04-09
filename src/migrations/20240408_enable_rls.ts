@@ -2,89 +2,80 @@ import { MigrateUpArgs, MigrateDownArgs } from '@payloadcms/db-postgres'
 
 export async function up({ payload }: MigrateUpArgs): Promise<void> {
   try {
-    // Enable RLS on all tables (required by Supabase)
-    await payload.db.pool.query(`
-      -- Enable RLS on all content block tables
-      ALTER TABLE "public"."pages_blocks_cta" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."pages_blocks_cta_links" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."pages_blocks_content" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."pages_blocks_content_columns" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."pages_blocks_media_block" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."pages_blocks_archive" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."forms" ENABLE ROW LEVEL SECURITY;
-      
-      -- Enable RLS on public content collection tables
-      ALTER TABLE "public"."media" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."categories" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."pages" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."posts" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."curatorship" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."discography" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."mixes" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."sound_design" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."events" ENABLE ROW LEVEL SECURITY;
-      
-      -- Enable RLS on admin/protected tables (but don't add public access)
-      ALTER TABLE "public"."payload_migrations" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."payload_preferences" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."payload_users" ENABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."users" ENABLE ROW LEVEL SECURITY; 
-      ALTER TABLE "public"."api_keys" ENABLE ROW LEVEL SECURITY;
-
-      -- Create policies for public content blocks (read-only)
-      CREATE POLICY "Enable read access for all users" ON "public"."pages_blocks_cta"
-        FOR SELECT USING (true);
-
-      CREATE POLICY "Enable read access for all users" ON "public"."pages_blocks_cta_links"
-        FOR SELECT USING (true);
-
-      CREATE POLICY "Enable read access for all users" ON "public"."pages_blocks_content"
-        FOR SELECT USING (true);
-
-      CREATE POLICY "Enable read access for all users" ON "public"."pages_blocks_content_columns"
-        FOR SELECT USING (true);
-
-      CREATE POLICY "Enable read access for all users" ON "public"."pages_blocks_media_block"
-        FOR SELECT USING (true);
-
-      CREATE POLICY "Enable read access for all users" ON "public"."pages_blocks_archive"
-        FOR SELECT USING (true);
-
-      CREATE POLICY "Enable read access for all users" ON "public"."forms"
-        FOR SELECT USING (true);
-        
-      -- Create policies for public content collections (read-only)
-      CREATE POLICY "Enable read access for all users" ON "public"."media"
-        FOR SELECT USING (true);
-
-      CREATE POLICY "Enable read access for all users" ON "public"."categories"
-        FOR SELECT USING (true);
-
-      CREATE POLICY "Enable read access for all users" ON "public"."pages"
-        FOR SELECT USING (true);
-
-      CREATE POLICY "Enable read access for all users" ON "public"."posts"
-        FOR SELECT USING (true);
-
-      CREATE POLICY "Enable read access for all users" ON "public"."curatorship"
-        FOR SELECT USING (true);
-
-      CREATE POLICY "Enable read access for all users" ON "public"."discography"
-        FOR SELECT USING (true);
-
-      CREATE POLICY "Enable read access for all users" ON "public"."mixes"
-        FOR SELECT USING (true);
-
-      CREATE POLICY "Enable read access for all users" ON "public"."sound_design"
-        FOR SELECT USING (true);
-
-      CREATE POLICY "Enable read access for all users" ON "public"."events"
-        FOR SELECT USING (true);
-        
-      -- Create admin-only policies for protected tables
-      -- These require the service role or authenticated admin access
-      -- No public read policies are created for these tables
+    // First, get a list of all tables that actually exist
+    const tablesResult = await payload.db.pool.query(`
+      SELECT tablename 
+      FROM pg_catalog.pg_tables 
+      WHERE schemaname = 'public'
     `)
+
+    const existingTables = tablesResult.rows.map((row) => row.tablename)
+    console.log('Existing tables:', existingTables)
+
+    // Build a dynamic query to only operate on tables that exist
+    let enableRlsQuery = ''
+    let publicPoliciesQuery = ''
+
+    // Content block tables - only add if they exist
+    const contentBlockTables = [
+      'pages_blocks_cta',
+      'pages_blocks_cta_links',
+      'pages_blocks_content',
+      'pages_blocks_content_columns',
+      'pages_blocks_media_block',
+      'pages_blocks_archive',
+      'forms',
+    ]
+
+    // Public content tables - only add if they exist
+    const publicContentTables = [
+      'media',
+      'categories',
+      'pages',
+      'posts',
+      'curatorship',
+      'discography',
+      'mixes',
+      'sound_design',
+      'events',
+    ]
+
+    // Admin tables - enable RLS but no public policies - only add if they exist
+    const adminTables = [
+      'payload_migrations',
+      'payload_preferences',
+      'payload_users',
+      'users',
+      'api_keys',
+    ]
+
+    // Add enable RLS commands for tables that exist
+    for (const table of [...contentBlockTables, ...publicContentTables, ...adminTables]) {
+      if (existingTables.includes(table)) {
+        enableRlsQuery += `ALTER TABLE "public"."${table}" ENABLE ROW LEVEL SECURITY;\n`
+      }
+    }
+
+    // Add policies for public tables that exist
+    for (const table of [...contentBlockTables, ...publicContentTables]) {
+      if (existingTables.includes(table)) {
+        publicPoliciesQuery += `
+          CREATE POLICY "Enable read access for all users" ON "public"."${table}"
+            FOR SELECT USING (true);
+        `
+      }
+    }
+
+    // Execute the dynamic queries
+    if (enableRlsQuery) {
+      console.log('Enabling RLS on tables that exist...')
+      await payload.db.pool.query(enableRlsQuery)
+    }
+
+    if (publicPoliciesQuery) {
+      console.log('Creating public read policies for content tables...')
+      await payload.db.pool.query(publicPoliciesQuery)
+    }
 
     console.log('Successfully enabled RLS and created appropriate security policies')
   } catch (error) {
@@ -95,56 +86,63 @@ export async function up({ payload }: MigrateUpArgs): Promise<void> {
 
 export async function down({ payload }: MigrateDownArgs): Promise<void> {
   try {
-    // Disable RLS and drop policies
-    await payload.db.pool.query(`
-      -- Drop policies for content blocks
-      DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."pages_blocks_cta";
-      DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."pages_blocks_cta_links";
-      DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."pages_blocks_content";
-      DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."pages_blocks_content_columns";
-      DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."pages_blocks_media_block";
-      DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."pages_blocks_archive";
-      DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."forms";
-      
-      -- Drop policies for public content collections
-      DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."media";
-      DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."categories";
-      DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."pages";
-      DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."posts";
-      DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."curatorship";
-      DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."discography";
-      DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."mixes";
-      DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."sound_design";
-      DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."events";
-
-      -- Disable RLS on all tables
-      -- Content blocks
-      ALTER TABLE "public"."pages_blocks_cta" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."pages_blocks_cta_links" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."pages_blocks_content" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."pages_blocks_content_columns" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."pages_blocks_media_block" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."pages_blocks_archive" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."forms" DISABLE ROW LEVEL SECURITY;
-      
-      -- Public content collections
-      ALTER TABLE "public"."media" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."categories" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."pages" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."posts" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."curatorship" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."discography" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."mixes" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."sound_design" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."events" DISABLE ROW LEVEL SECURITY;
-      
-      -- Admin/protected tables
-      ALTER TABLE "public"."payload_migrations" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."payload_preferences" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."payload_users" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."users" DISABLE ROW LEVEL SECURITY;
-      ALTER TABLE "public"."api_keys" DISABLE ROW LEVEL SECURITY;
+    // First, get a list of all tables that actually exist
+    const tablesResult = await payload.db.pool.query(`
+      SELECT tablename 
+      FROM pg_catalog.pg_tables 
+      WHERE schemaname = 'public'
     `)
+
+    const existingTables = tablesResult.rows.map((row) => row.tablename)
+    console.log('Existing tables for down migration:', existingTables)
+
+    // Build a dynamic query to only operate on tables that exist
+    let dropPoliciesQuery = ''
+    let disableRlsQuery = ''
+
+    // All tables that might have policies
+    const allTables = [
+      'pages_blocks_cta',
+      'pages_blocks_cta_links',
+      'pages_blocks_content',
+      'pages_blocks_content_columns',
+      'pages_blocks_media_block',
+      'pages_blocks_archive',
+      'forms',
+      'media',
+      'categories',
+      'pages',
+      'posts',
+      'curatorship',
+      'discography',
+      'mixes',
+      'sound_design',
+      'events',
+      'payload_migrations',
+      'payload_preferences',
+      'payload_users',
+      'users',
+      'api_keys',
+    ]
+
+    // Drop policies for tables that exist
+    for (const table of allTables) {
+      if (existingTables.includes(table)) {
+        dropPoliciesQuery += `DROP POLICY IF EXISTS "Enable read access for all users" ON "public"."${table}";\n`
+        disableRlsQuery += `ALTER TABLE "public"."${table}" DISABLE ROW LEVEL SECURITY;\n`
+      }
+    }
+
+    // Execute the dynamic queries
+    if (dropPoliciesQuery) {
+      console.log('Dropping policies...')
+      await payload.db.pool.query(dropPoliciesQuery)
+    }
+
+    if (disableRlsQuery) {
+      console.log('Disabling RLS...')
+      await payload.db.pool.query(disableRlsQuery)
+    }
 
     console.log('Successfully disabled RLS and dropped policies')
   } catch (error) {
