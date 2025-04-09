@@ -1,12 +1,9 @@
 import type { Metadata } from 'next/types'
-
-import { CollectionArchive } from '@/components/CollectionArchive'
-import { PageRange } from '@/components/PageRange'
+import React from 'react'
 import { Pagination } from '@/components/Pagination'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
-import React from 'react'
-import PageClient from './page.client'
+import RichText from '@/components/RichText'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -24,40 +21,76 @@ export default async function Page() {
       slug: true,
       categories: true,
       meta: true,
+      content: true,
+      createdAt: true,
     },
   })
 
   return (
-    <div className="pt-24 pb-24">
-      <PageClient />
-      <div className="container mb-16">
-        <div className="prose dark:prose-invert max-w-none">
-          <h1>Posts</h1>
+    <>
+      <div className="container mb-20">
+        <div className="pt-8 mb-4 border-b border-[var(--border-color)]">
+          <h1 className="text-left text-[11px]">--- DESK INDEX ---</h1>
+        </div>
+
+        <div className="flex flex-col gap-8">
+          {posts?.docs.map((post, index) => (
+            <article
+              key={post.slug}
+              className={`pb-8 ${index !== posts.docs.length - 1 ? 'border-b border-[var(--border-color)]' : ''}`}
+            >
+              <p className="text-[var(--secondary-text)] text-base">
+                {new Date(post.createdAt).toISOString().replace('T', ' ').split('.')[0]}
+              </p>
+              <h1 className="text-left text-[11px] uppercase">--- {post.title} ---</h1>
+              {/* Hiding categories for now */}
+              {/* {Array.isArray(post.categories) && post.categories.length > 0 && (
+                <div className="text-[var(--secondary-text)] text-[11px]">
+                  {post.categories.map((category, index) => {
+                    if (typeof category === 'object' && category !== null) {
+                      const { title: categoryTitle } = category
+                      const isLast = index === post.categories!.length - 1
+                      return (
+                        <React.Fragment key={index}>
+                          {categoryTitle}
+                          {!isLast && <React.Fragment>, &nbsp;</React.Fragment>}
+                        </React.Fragment>
+                      )
+                    }
+                    return null
+                  })}
+                </div>
+              )} */}
+              {post.content && (
+                <div className="prose mt-4">
+                  <RichText data={post.content} />
+                </div>
+              )}
+            </article>
+          ))}
         </div>
       </div>
 
-      <div className="container mb-8">
+      {/* <div className="container mb-8">
         <PageRange
           collection="posts"
           currentPage={posts.page}
           limit={12}
           totalDocs={posts.totalDocs}
         />
-      </div>
-
-      <CollectionArchive posts={posts.docs} />
+      </div> */}
 
       <div className="container">
         {posts.totalPages > 1 && posts.page && (
           <Pagination page={posts.page} totalPages={posts.totalPages} />
         )}
       </div>
-    </div>
+    </>
   )
 }
 
 export function generateMetadata(): Metadata {
   return {
-    title: `Payload Website Template Posts`,
+    title: `Posts`,
   }
 }

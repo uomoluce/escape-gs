@@ -10,6 +10,13 @@ export const Header: GlobalConfig = {
   },
   fields: [
     {
+      name: 'description',
+      type: 'textarea',
+      admin: {
+        description: 'This will be used in the header as a short blurb/bio.',
+      },
+    },
+    {
       name: 'navItems',
       type: 'array',
       fields: [

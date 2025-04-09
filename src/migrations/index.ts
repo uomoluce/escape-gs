@@ -3,6 +3,7 @@ import * as m20250319_194207 from './20250319_194207'
 import * as drop_audio_id from './20240323_drop_audio_id'
 import * as add_audio_url from './20240323_add_audio_url'
 import * as add_event_type from './20240323_add_event_type'
+import * as safe_posts_relationship_update from './20240407_safe_posts_relationship_update'
 
 export const migrations = [
   {
@@ -25,5 +26,10 @@ export const migrations = [
     up: add_event_type.up,
     down: add_event_type.down,
     name: '20240323_add_event_type',
+  },
+  {
+    up: safe_posts_relationship_update.up,
+    down: safe_posts_relationship_update.down,
+    name: '20240407_safe_posts_relationship_update',
   },
 ]
