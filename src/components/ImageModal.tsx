@@ -16,7 +16,7 @@ export const ImageModal: React.FC<ImageModalProps> = ({ isOpen, onClose, imageUr
         <img
           src={imageUrl}
           alt={alt}
-          className="object-contain max-w-[80vw] max-h-[80vh] w-auto h-auto"
+          className="object-contain max-w-[80vw] max-h-[80vh] w-auto h-auto grayscale brightness-90 contrast-125"
           onError={onClose}
         />
       </div>
