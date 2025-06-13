@@ -7,6 +7,7 @@ import * as safe_posts_relationship_update from './20240407_safe_posts_relations
 import * as enable_rls from './20240408_enable_rls'
 import * as add_header_description from './20240409_add_header_description'
 import * as enable_rls_all_tables from './20240409_enable_rls_all_tables'
+import * as add_header_email from './20240409_add_header_email'
 
 export const migrations = [
   {
@@ -38,4 +39,5 @@ export const migrations = [
   enable_rls,
   add_header_description,
   enable_rls_all_tables,
+  add_header_email,
 ]
