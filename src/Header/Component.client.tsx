@@ -34,7 +34,9 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
           )}
         </div>
         {data.description && (
-          <div className="w-1/2 text-[var(--secondary-text)] text-right">{data.description}</div>
+          <div className="w-1/2 text-[var(--secondary-text)] text-right content-end">
+            {data.description}
+          </div>
         )}
         {/* leaving the theme selector out for now */}
         {/* <div className="w-1/3 text-right">

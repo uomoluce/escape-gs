@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import React from 'react'
 
 interface ImageModalProps {
   isOpen: boolean
@@ -13,16 +13,10 @@ export const ImageModal: React.FC<ImageModalProps> = ({ isOpen, onClose, imageUr
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
       <div className="relative max-w-[80vw] max-h-[80vh]" onClick={(e) => e.stopPropagation()}>
-        <Image
+        <img
           src={imageUrl}
           alt={alt}
-          width={1200}
-          height={800}
           className="object-contain max-w-[80vw] max-h-[80vh] w-auto h-auto"
-          style={{
-            width: 'auto',
-            height: 'auto',
-          }}
           onError={onClose}
         />
       </div>
