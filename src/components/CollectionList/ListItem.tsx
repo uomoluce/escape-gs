@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ImageIcon, PauseIcon, PlayIcon } from 'lucide-react'
 import type { ListItemProps } from './types'
+import { EmbedWrapper } from '@/components/EmbedWrapper'
 
 export const ListItem: React.FC<ListItemProps> = ({
   item,
@@ -314,7 +315,7 @@ export const ListItem: React.FC<ListItemProps> = ({
               }
               onAudioToggle()
             }}
-            className="inline-flex items-center hover:opacity-75 transition-opacity text-[11px] text-[var(--secondary-text)] text-opacity-70"
+            className="inline-flex items-center hover:opacity-75 transition-opacity text-[var(--secondary-text)] text-opacity-70"
             aria-label={
               isAudioVisible ? (isPlaying ? 'Pause audio' : 'Play audio') : 'Show audio player'
             }
@@ -326,7 +327,7 @@ export const ListItem: React.FC<ListItemProps> = ({
         return hasVideoContent ? (
           <button
             onClick={onVideoToggle}
-            className="inline-flex items-center hover:opacity-75 transition-opacity text-[11px] text-[var(--secondary-text)] text-opacity-70"
+            className="inline-flex items-center hover:opacity-75 transition-opacity text-[var(--secondary-text)] text-opacity-70"
             aria-label={isVideoVisible ? 'Hide video player' : 'Show video player'}
           >
             {isVideoVisible ? 'HIDE' : 'WATCH'}
@@ -419,10 +420,9 @@ export const ListItem: React.FC<ListItemProps> = ({
   const renderMediaPlayer = () => {
     if (isVideoVisible && item.videoEmbed) {
       return (
-        <div
-          className="w-full md:w-[calc(100%-120px)] md:ml-[120px] my-4"
-          dangerouslySetInnerHTML={{ __html: item.videoEmbed }}
-        />
+        <div className="w-full md:w-[calc(100%-120px)] md:ml-[120px] my-4">
+          <EmbedWrapper html={item.videoEmbed} isDesktopOnly={true} />
+        </div>
       )
     }
 
@@ -481,10 +481,9 @@ export const ListItem: React.FC<ListItemProps> = ({
       // Finally fall back to Soundcloud embed if available
       if (item.soundcloudEmbed) {
         return (
-          <div
-            className="w-full md:w-[calc(100%-60px)] md:ml-[60px] my-4"
-            dangerouslySetInnerHTML={{ __html: item.soundcloudEmbed }}
-          />
+          <div className="w-full md:w-[calc(100%-60px)] md:ml-[60px] my-4">
+            <EmbedWrapper html={item.soundcloudEmbed} isDesktopOnly={true} />
+          </div>
         )
       }
     }
@@ -540,7 +539,7 @@ export const ListItem: React.FC<ListItemProps> = ({
           })
           .map(({ field }) => (
             <div key={field} className={`${field.toLowerCase()} flex items-center gap-1`}>
-              <span className="text-[11px] text-[var(--secondary-text)] text-opacity-70">
+              <span className="text-[var(--secondary-text)] text-opacity-70">
                 {field === 'eventType' ? 'Type' : field.charAt(0).toUpperCase() + field.slice(1)}:
               </span>
               {renderCell(field)}
@@ -566,7 +565,7 @@ export const ListItem: React.FC<ListItemProps> = ({
                 ) : (
                   <PlayIcon className="w-4 h-4 text-[var(--secondary-text)]" />
                 )}
-                <span className="text-[11px] text-[var(--secondary-text)] text-opacity-70">
+                <span className="text-[var(--secondary-text)] text-opacity-70">
                   {isAudioVisible ? (isPlaying ? 'PAUSE' : 'PLAY') : 'PLAY'}
                 </span>
               </button>
@@ -582,7 +581,7 @@ export const ListItem: React.FC<ListItemProps> = ({
                 ) : (
                   <PlayIcon className="w-4 h-4 text-[var(--secondary-text)]" />
                 )}
-                <span className="text-[11px] text-[var(--secondary-text)] text-opacity-70">
+                <span className="text-[var(--secondary-text)] text-opacity-70">
                   {isVideoVisible ? 'HIDE' : 'WATCH'}
                 </span>
               </button>
@@ -592,9 +591,7 @@ export const ListItem: React.FC<ListItemProps> = ({
         {/* Render duration last if there's audio content */}
         {hasAudioContent && (
           <div className="flex items-center gap-1 justify-end">
-            <span className="text-[11px] text-[var(--secondary-text)] text-opacity-70">
-              Duration:
-            </span>
+            <span className="text-[var(--secondary-text)] text-opacity-70">Duration:</span>
             {renderCell('duration')}
           </div>
         )}

@@ -19,19 +19,18 @@ export default async function Page() {
       soundcloudEmbed: true,
       videoEmbed: true,
     },
-    sort: '-year', // Sort by year in descending order
+    sort: '-year', // Sort by date in descending order
   })
 
   const columns = [
     { field: 'year', width: '60px' },
-    { field: 'play', width: '60px' },
-    { field: 'watch', width: '70px' },
+    { field: 'play', width: '70px' },
+    { field: 'watch', width: '80px' },
     { field: 'title', width: 'minmax(250px, 2fr)' },
     { field: 'platform', width: 'minmax(120px, 1fr)' },
     { field: 'duration', width: '150px' },
   ]
 
-  // Convert id to string and handle null values
   const items = soundDesign?.docs.map((item) => ({
     id: String(item.id),
     title: item.title,
@@ -43,11 +42,7 @@ export default async function Page() {
     videoEmbed: item.videoEmbed || undefined,
   }))
 
-  return (
-    <>
-      <CollectionList columns={columns} items={items} collectionType="sound-design" />
-    </>
-  )
+  return <CollectionList columns={columns} items={items} collectionType="sound-design" />
 }
 
 export function generateMetadata(): Metadata {

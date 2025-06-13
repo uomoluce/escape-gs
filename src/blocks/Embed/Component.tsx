@@ -1,4 +1,5 @@
 import React from 'react'
+import { EmbedWrapper } from '@/components/EmbedWrapper'
 
 type Props = {
   className?: string
@@ -8,7 +9,7 @@ type Props = {
 export const EmbedBlock: React.FC<Props> = ({ className, html }) => {
   return (
     <div className={className}>
-      <div className="relative w-full overflow-hidden" dangerouslySetInnerHTML={{ __html: html }} />
+      <EmbedWrapper html={html} />
     </div>
   )
 }

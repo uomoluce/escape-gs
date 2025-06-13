@@ -8,10 +8,15 @@ interface EventsPageProps {
   children: React.ReactElement<{ items: Item[] }>
 }
 
+/**
+ * EventsPage component
+ * Shows a list of events with a filter for event type
+ * Separate component as this is a client component and needs to be dynamic
+ */
 export function EventsPage({ children }: EventsPageProps) {
   const [selectedType, setSelectedType] = useState<string | null>(null)
 
-  // Define all possible event types and their labels
+  // Define event types and their labels
   const eventTypeLabels: Record<string, string> = {
     dj_set: 'dj_set',
     live: 'live',
@@ -52,7 +57,7 @@ export function EventsPage({ children }: EventsPageProps) {
                   className="inline-block w-2 h-2 rounded-full bg-[var(--accent-color)]"
                   style={{ opacity }}
                 />
-                <span className="text-[11px] text-[var(--secondary-text)] uppercase">{label}</span>
+                <span className="text-[var(--secondary-text)] uppercase">{label}</span>
               </div>
             )
           }
@@ -74,7 +79,7 @@ export function EventsPage({ children }: EventsPageProps) {
                 style={{ opacity }}
               />
               <span
-                className={`text-[11px] uppercase ${
+                className={`uppercase ${
                   isSelected
                     ? 'text-[var(--nav-link-active-color)]'
                     : 'text-[var(--secondary-text)]'

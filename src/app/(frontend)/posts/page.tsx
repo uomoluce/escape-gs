@@ -30,7 +30,7 @@ export default async function Page() {
     <>
       <div className="container mb-20">
         <div className="pt-8 mb-4 border-b border-[var(--border-color)]">
-          <h1 className="text-left text-[11px]">--- DESK INDEX ---</h1>
+          <h1 className="text-left">--- DESK INDEX ---</h1>
         </div>
 
         <div className="flex flex-col gap-8">
@@ -42,10 +42,10 @@ export default async function Page() {
               <p className="text-[var(--secondary-text)] text-base">
                 {new Date(post.createdAt).toISOString().replace('T', ' ').split('.')[0]}
               </p>
-              <h1 className="text-left text-[11px] uppercase">--- {post.title} ---</h1>
+              <h1 className="text-left uppercase">--- {post.title} ---</h1>
               {/* Hiding categories for now */}
               {/* {Array.isArray(post.categories) && post.categories.length > 0 && (
-                <div className="text-[var(--secondary-text)] text-[11px]">
+                <div className="text-[var(--secondary-text)]">
                   {post.categories.map((category, index) => {
                     if (typeof category === 'object' && category !== null) {
                       const { title: categoryTitle } = category

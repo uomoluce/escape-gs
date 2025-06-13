@@ -4,7 +4,7 @@ export default function CollectionsLayout({ children }: { children: React.ReactN
   return (
     <div className="container mb-20">
       <div className="pt-8 mb-4 border-b border-[var(--border-color)]">
-        <h1 className="text-left text-[11px]">--- CATALOGUE INDEX ---</h1>
+        <h1 className="text-left">--- CATALOGUE INDEX ---</h1>
       </div>
       {children}
     </div>

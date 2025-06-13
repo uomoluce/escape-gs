@@ -31,17 +31,17 @@ export default async function Page() {
         },
       },
     },
-    sort: '-year',
+    sort: '-year', // Sort by date in descending order
   })
 
-  // Define columns for the collection list
   const columns = [
     { field: 'year', width: '60px' },
-    { field: 'play', width: '60px' },
-    { field: 'watch', width: '70px' },
+    { field: 'play', width: '70px' },
+    { field: 'watch', width: '80px' },
     { field: 'eventType', width: '60px' },
     { field: 'title', width: '1fr' },
     { field: 'location', width: '1fr' },
+    { field: 'duration', width: '150px' },
   ]
 
   const items: Item[] =

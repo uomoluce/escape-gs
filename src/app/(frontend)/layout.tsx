@@ -20,6 +20,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>
+      <div dangerouslySetInnerHTML={{ __html: `<!-- foo bar -->` }} />
+
       <head>
         <InitTheme />
         <link href="/favicon.jpeg" rel="icon" type="image/jpeg" />

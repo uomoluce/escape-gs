@@ -18,6 +18,7 @@ export const ListItems = ({ items, columns, collectionType }: ListItemsProps) =>
   // Keep track of the last year we've seen
   let lastYear: string | null = null
 
+  // Yes, I'm aware he prop drilling is not ideal but it gets the job done for now
   return (
     <>
       {items.map((item) => {

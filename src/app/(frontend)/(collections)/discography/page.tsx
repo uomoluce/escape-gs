@@ -2,7 +2,6 @@ import type { Metadata } from 'next/types'
 import React from 'react'
 import { CollectionList } from '@/components/CollectionList'
 import { getPayloadData } from '@/lib/payload-utils'
-import type { Media } from '@/payload-types'
 export const dynamic = 'force-static'
 
 export default async function Page() {
@@ -18,19 +17,18 @@ export default async function Page() {
       soundcloudEmbed: true,
       videoEmbed: true,
     },
-    sort: '-year',
+    sort: '-year', // Sort by date in descending order
   })
 
   const columns = [
     { field: 'year', width: '60px' },
-    { field: 'play', width: '60px' },
-    { field: 'watch', width: '70px' },
+    { field: 'play', width: '70px' },
+    { field: 'watch', width: '80px' },
     { field: 'title', width: 'minmax(250px, 2fr)' },
     { field: 'label', width: 'minmax(120px, 1fr)' },
     { field: 'type', width: 'minmax(100px, 1fr)' },
   ]
 
-  // Convert id to string and handle null values
   const items = discography?.docs.map((item) => ({
     id: String(item.id),
     title: item.title,
@@ -43,11 +41,7 @@ export default async function Page() {
     videoEmbed: item.videoEmbed || undefined,
   }))
 
-  return (
-    <>
-      <CollectionList columns={columns} items={items} collectionType="discography" />
-    </>
-  )
+  return <CollectionList columns={columns} items={items} collectionType="discography" />
 }
 
 export function generateMetadata(): Metadata {

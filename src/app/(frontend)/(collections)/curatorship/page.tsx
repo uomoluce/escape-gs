@@ -4,7 +4,6 @@ import { CollectionList } from '@/components/CollectionList'
 import { getPayloadData } from '@/lib/payload-utils'
 import type { Item } from '@/components/CollectionList/types'
 export const dynamic = 'force-static'
-export const revalidate = 600
 
 export default async function Page() {
   const curatorship = await getPayloadData('curatorship', {
@@ -15,7 +14,7 @@ export default async function Page() {
       role: true,
       url: true,
     },
-    sort: '-date',
+    sort: '-date', // Sort by date in descending order
   })
 
   const columns = [
@@ -24,7 +23,6 @@ export default async function Page() {
     { field: 'role', width: 'minmax(120px, 1fr)' },
   ]
 
-  // Map items to include required title field
   const items: Item[] = curatorship?.docs.map(({ id, date, entity, role, url }) => ({
     id: String(id),
     title: entity,
@@ -34,11 +32,7 @@ export default async function Page() {
     url: url || undefined,
   }))
 
-  return (
-    <>
-      <CollectionList columns={columns} items={items} collectionType="curatorship" />
-    </>
-  )
+  return <CollectionList columns={columns} items={items} collectionType="curatorship" />
 }
 
 export function generateMetadata(): Metadata {
