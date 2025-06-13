@@ -17,6 +17,14 @@ export const Header: GlobalConfig = {
       },
     },
     {
+      name: 'email',
+      type: 'email',
+    },
+    {
+      name: 'instagram',
+      type: 'text',
+    },
+    {
       name: 'navItems',
       type: 'array',
       fields: [

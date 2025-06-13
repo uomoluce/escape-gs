@@ -24,7 +24,14 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
       <div className="pt-8 pb-1 flex border-b border-[var(--border-color)] text-[var(--secondary-text)] dark:text-white">
         <div className="w-1/2">
           gs <br />
-          b.1991, IT
+          b.1991, IT <br />
+          {data.email && <a href={`mailto:${data.email}`}>EMAIL</a>}
+          {data.instagram && (
+            <a href={data.instagram} target="_blank">
+              {' '}
+              / IG
+            </a>
+          )}
         </div>
         {data.description && (
           <div className="w-1/2 text-[var(--secondary-text)] text-right">{data.description}</div>

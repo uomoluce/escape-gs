@@ -3,9 +3,10 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ImageIcon, PauseIcon, PlayIcon } from 'lucide-react'
+import { ImageIcon, PauseIcon, PlayIcon, X } from 'lucide-react'
 import type { ListItemProps } from './types'
 import { EmbedWrapper } from '@/components/EmbedWrapper'
+import { ImageModal } from '@/components/ImageModal'
 
 export const ListItem: React.FC<ListItemProps> = ({
   item,
@@ -21,7 +22,6 @@ export const ListItem: React.FC<ListItemProps> = ({
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [showImage, setShowImage] = useState(false)
-  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
   const audioRef = useRef<HTMLAudioElement>(null)
   const progressBarRef = useRef<HTMLDivElement>(null)
@@ -100,39 +100,6 @@ export const ListItem: React.FC<ListItemProps> = ({
     }
   }, [isAudioVisible])
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging && progressBarRef.current && audioRef.current && duration) {
-        const rect = progressBarRef.current.getBoundingClientRect()
-        let position = (e.clientX - rect.left) / rect.width
-
-        // Clamp position between 0 and 1
-        position = Math.max(0, Math.min(1, position))
-
-        const seekTime = position * duration
-        audioRef.current.currentTime = seekTime
-        setCurrentTime(seekTime)
-      }
-    }
-
-    const handleMouseUp = () => {
-      setIsDragging(false)
-      if (isPlaying && audioRef.current) {
-        audioRef.current.play()
-      }
-    }
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove)
-      document.addEventListener('mouseup', handleMouseUp)
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
-    }
-  }, [isDragging, duration, isPlaying])
-
   const updateTime = () => {
     if (audioRef.current) {
       // Force UI update with the current audio position
@@ -190,13 +157,10 @@ export const ListItem: React.FC<ListItemProps> = ({
     }
   }
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (hasImage) {
-      // Calculate position with offset to prevent image from being under cursor
-      setCursorPosition({
-        x: e.clientX + 20,
-        y: e.clientY + 20,
-      })
+  const handleTitleClick = (e: React.MouseEvent) => {
+    if (collectionType === 'events' && hasImage) {
+      e.preventDefault()
+      setShowImage(!showImage)
     }
   }
 
@@ -229,10 +193,8 @@ export const ListItem: React.FC<ListItemProps> = ({
   const renderTitle = () => {
     const titleContent = (
       <span
-        className={`${hasExternalUrl ? 'hover:opacity-75 transition-opacity' : ''} ${hasImage ? 'relative' : ''}`}
-        onMouseEnter={() => hasImage && setShowImage(true)}
-        onMouseLeave={() => hasImage && setShowImage(false)}
-        onMouseMove={handleMouseMove}
+        className={`hover:opacity-75 transition-opacity ${hasImage && collectionType === 'events' ? 'cursor-pointer' : ''}`}
+        onClick={handleTitleClick}
       >
         {item.title}
       </span>
@@ -244,14 +206,11 @@ export const ListItem: React.FC<ListItemProps> = ({
           <Link
             href={item.url || '#'}
             target="_blank"
-            className="hover:opacity-75"
-            onMouseEnter={() => hasImage && setShowImage(true)}
-            onMouseLeave={() => hasImage && setShowImage(false)}
-            onMouseMove={handleMouseMove}
+            className="hover:opacity-75 transition-opacity"
+            onClick={handleTitleClick}
           >
             {titleContent}
           </Link>
-          {/* <ExternalLinkIcon /> */}
         </div>
       )
     }
@@ -341,18 +300,15 @@ export const ListItem: React.FC<ListItemProps> = ({
                 href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:underline"
-                onMouseEnter={() => hasImage && setShowImage(true)}
-                onMouseLeave={() => hasImage && setShowImage(false)}
-                onMouseMove={handleMouseMove}
+                className="hover:underline hover:opacity-75 transition-opacity cursor-pointer"
+                onClick={handleTitleClick}
               >
                 {item.title}
               </Link>
             ) : (
               <span
-                onMouseEnter={() => hasImage && setShowImage(true)}
-                onMouseLeave={() => hasImage && setShowImage(false)}
-                onMouseMove={handleMouseMove}
+                onClick={handleTitleClick}
+                className="hover:underline hover:opacity-75 transition-opacity cursor-pointer"
               >
                 {item.title}
               </span>
@@ -491,20 +447,14 @@ export const ListItem: React.FC<ListItemProps> = ({
     return null
   }
 
-  // Add helper function to get the thumbnail URL
-  const getThumbnailUrl = (image: any): string => {
-    // First check if the image has sizes.thumbnail (preferred)
-    if (image?.sizes?.thumbnail?.url) {
-      return image.sizes.thumbnail.url
+  const getImageUrl = (image: any): string => {
+    if (image?.url) {
+      return image.url
     }
-
-    // Some Payload configurations provide thumbnailURL directly
-    if (image?.thumbnailURL) {
-      return image.thumbnailURL
+    if (typeof image === 'string') {
+      return image
     }
-
-    // Fallback to the original URL
-    return image.url
+    return ''
   }
 
   return (
@@ -619,34 +569,12 @@ export const ListItem: React.FC<ListItemProps> = ({
         {(hasAudioContent || hasVideoContent) && renderMediaPlayer()}
       </div>
 
-      {/* Render the hovering image at the document level to avoid containment issues */}
-      {hasImage && showImage && (
-        <div
-          className="fixed z-50 overflow-hidden pointer-events-none"
-          style={{
-            left: `${cursorPosition.x}px`,
-            top: `${cursorPosition.y}px`,
-            transition: 'left 0.05s, top 0.05s',
-          }}
-        >
-          <Image
-            src={getThumbnailUrl(item.image)}
-            alt={item.title || 'Event image'}
-            width={300}
-            height={200}
-            className="object-contain max-w-[300px] max-h-[200px] w-auto h-auto mix-blend-difference"
-            style={{
-              width: 'auto',
-              height: 'auto',
-            }}
-            onError={() => {
-              setShowImage(false)
-              // Update hasImage to prevent future attempts
-              item.image = null
-            }}
-          />
-        </div>
-      )}
+      <ImageModal
+        isOpen={showImage}
+        onClose={() => setShowImage(false)}
+        imageUrl={getImageUrl(item.image)}
+        alt={item.title || 'Event image'}
+      />
     </div>
   )
 }

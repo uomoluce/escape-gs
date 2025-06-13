@@ -109,24 +109,24 @@ export default buildConfig({
   globals: [Header],
   plugins: [
     ...plugins,
-    // Configure Vercel Blob Storage following best practices
-    vercelBlobStorage({
-      token: process.env.BLOB_READ_WRITE_TOKEN || 'vercel_blob_rw_dummy_123456789',
-      collections: {
-        [Media.slug]: {
-          // Always use Vercel Blob in production
-          disableLocalStorage: process.env.NODE_ENV === 'production',
-          // Enable client-side uploads for large files
-          clientUploads: true,
-          // Add upload limits for client-side uploads
-          limits: {
-            fileSize: 26214400, // 25MB in bytes (leaving room for overhead)
-          },
-        },
-      },
-      // Enable client uploads globally
-      clientUploads: true,
-    }),
+    // Only use Vercel Blob in production
+    ...(process.env.NODE_ENV === 'production'
+      ? [
+          vercelBlobStorage({
+            token: process.env.BLOB_READ_WRITE_TOKEN || 'vercel_blob_rw_dummy_123456789',
+            collections: {
+              [Media.slug]: {
+                disableLocalStorage: true,
+                clientUploads: true,
+                limits: {
+                  fileSize: 26214400, // 25MB in bytes
+                },
+              },
+            },
+            clientUploads: true,
+          }),
+        ]
+      : []),
   ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,

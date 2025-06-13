@@ -1,4 +1,4 @@
-import type { Metadata } from 'next/types'
+import type { Metadata } from 'next'
 import React from 'react'
 import { getPayloadData } from '@/lib/payload-utils'
 import type { Media } from '@/payload-types'
@@ -11,6 +11,7 @@ export const revalidate = 600
 
 export default async function Page() {
   const events = await getPayloadData('events', {
+    depth: 2,
     select: {
       id: true,
       title: true,
@@ -22,16 +23,18 @@ export default async function Page() {
       soundcloudEmbed: true,
       videoEmbed: true,
       eventType: true,
+      image: true,
+    },
+    populate: {
       image: {
-        url: true,
-        sizes: {
-          thumbnail: {
-            url: true,
-          },
+        select: {
+          id: true,
+          url: true,
+          filename: true,
         },
       },
     },
-    sort: '-year', // Sort by date in descending order
+    sort: '-year',
   })
 
   const columns = [
@@ -55,18 +58,7 @@ export default async function Page() {
       audioUrl: item.audioUrl || undefined,
       soundcloudEmbed: item.soundcloudEmbed || undefined,
       videoEmbed: item.videoEmbed || undefined,
-      image: item.image
-        ? {
-            url: item.image.url,
-            sizes: item.image.sizes?.thumbnail
-              ? {
-                  thumbnail: {
-                    url: item.image.sizes.thumbnail.url,
-                  },
-                }
-              : undefined,
-          }
-        : null,
+      image: item.image || null,
     })) || []
 
   return (

@@ -54,7 +54,6 @@ export type SupportedTimezones =
   | 'Asia/Singapore'
   | 'Asia/Tokyo'
   | 'Asia/Seoul'
-  | 'Australia/Brisbane'
   | 'Australia/Sydney'
   | 'Pacific/Guam'
   | 'Pacific/Noumea'
@@ -549,7 +548,6 @@ export interface Form {
             label?: string | null;
             width?: number | null;
             defaultValue?: string | null;
-            placeholder?: string | null;
             options?:
               | {
                   label: string;
@@ -1473,7 +1471,6 @@ export interface FormsSelect<T extends boolean = true> {
               label?: T;
               width?: T;
               defaultValue?: T;
-              placeholder?: T;
               options?:
                 | T
                 | {
@@ -1656,6 +1653,8 @@ export interface Header {
    * This will be used in the header as a short blurb/bio.
    */
   description?: string | null;
+  email?: string | null;
+  instagram?: string | null;
   navItems?:
     | {
         link: {
@@ -1685,6 +1684,8 @@ export interface Header {
  */
 export interface HeaderSelect<T extends boolean = true> {
   description?: T;
+  email?: T;
+  instagram?: T;
   navItems?:
     | T
     | {

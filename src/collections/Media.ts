@@ -41,6 +41,9 @@ export const Media: CollectionConfig = {
   upload: {
     // Vercel Blob configuration will be applied via the vercelBlobStorage plugin
     // Do not set staticDir to ensure files are stored in Vercel Blob
+    ...(process.env.NODE_ENV == 'development' && {
+      staticDir: path.resolve(dirname, '../../../public/media'),
+    }),
     adminThumbnail: 'thumbnail',
     focalPoint: true,
     imageSizes: [
@@ -76,5 +79,11 @@ export const Media: CollectionConfig = {
         crop: 'center',
       },
     ],
+    formatOptions: {
+      format: 'webp',
+      options: {
+        quality: 80,
+      },
+    },
   },
 }
