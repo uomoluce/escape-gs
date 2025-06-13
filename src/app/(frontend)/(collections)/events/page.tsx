@@ -31,6 +31,7 @@ export default async function Page() {
           id: true,
           url: true,
           filename: true,
+          sizes: true,
         },
       },
     },
@@ -63,6 +64,7 @@ export default async function Page() {
             id: item.image.id,
             url: item.image.url,
             filename: item.image.filename,
+            sizes: item.image.sizes,
           }
         : null,
     })) || []

@@ -441,7 +441,8 @@ export const ListItem: React.FC<ListItemProps> = ({
   }
 
   const getImageUrl = (image: any): string => {
-    return image?.url || ''
+    if (!image?.url) return ''
+    return image.sizes?.small?.url || image.url
   }
 
   return (

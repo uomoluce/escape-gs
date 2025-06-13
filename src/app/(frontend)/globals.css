@@ -193,7 +193,7 @@
   .nav-link {
     text-transform: uppercase;
     font-family: var(--font-sans);
-    font-size: (--font-size-base);
+    font-size: 13px;
     color: var(--nav-link-color);
   }
 
@@ -201,12 +201,6 @@
     color: var(--nav-link-active-color);
     text-decoration: underline;
     text-underline-offset: 4px;
-  }
-
-  [data-theme='dark'] .nav-link {
-    text-transform: uppercase;
-    font-family: var(--font-sans);
-    font-size: (--font-size-base);
   }
 
   button {
