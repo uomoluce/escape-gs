@@ -58,7 +58,13 @@ export default async function Page() {
       audioUrl: item.audioUrl || undefined,
       soundcloudEmbed: item.soundcloudEmbed || undefined,
       videoEmbed: item.videoEmbed || undefined,
-      image: item.image || null,
+      image: item.image
+        ? {
+            id: item.image.id,
+            url: item.image.url,
+            filename: item.image.filename,
+          }
+        : null,
     })) || []
 
   return (

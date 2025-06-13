@@ -193,25 +193,18 @@ export const ListItem: React.FC<ListItemProps> = ({
   const renderTitle = () => {
     const titleContent = (
       <span
-        className={`hover:opacity-75 transition-opacity ${hasImage && collectionType === 'events' ? 'cursor-pointer' : ''}`}
+        className={`${hasImage && collectionType === 'events' ? 'hover:opacity-75 transition-opacity cursor-pointer' : ''}`}
         onClick={handleTitleClick}
       >
         {item.title}
       </span>
     )
 
-    if (hasExternalUrl) {
+    if (hasExternalUrl && item.url) {
       return (
-        <div className="flex items-center gap-2">
-          <Link
-            href={item.url || '#'}
-            target="_blank"
-            className="hover:opacity-75 transition-opacity"
-            onClick={handleTitleClick}
-          >
-            {titleContent}
-          </Link>
-        </div>
+        <Link href={item.url} className="hover:opacity-75 transition-opacity">
+          {titleContent}
+        </Link>
       )
     }
 
@@ -300,7 +293,7 @@ export const ListItem: React.FC<ListItemProps> = ({
                 href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:underline hover:opacity-75 transition-opacity cursor-pointer"
+                className={`${hasImage && collectionType === 'events' ? 'hover:underline hover:opacity-75 transition-opacity cursor-pointer' : ''}`}
                 onClick={handleTitleClick}
               >
                 {item.title}
@@ -308,7 +301,7 @@ export const ListItem: React.FC<ListItemProps> = ({
             ) : (
               <span
                 onClick={handleTitleClick}
-                className="hover:underline hover:opacity-75 transition-opacity cursor-pointer"
+                className={`${hasImage && collectionType === 'events' ? 'hover:underline hover:opacity-75 transition-opacity cursor-pointer' : ''}`}
               >
                 {item.title}
               </span>
@@ -448,13 +441,7 @@ export const ListItem: React.FC<ListItemProps> = ({
   }
 
   const getImageUrl = (image: any): string => {
-    if (image?.url) {
-      return image.url
-    }
-    if (typeof image === 'string') {
-      return image
-    }
-    return ''
+    return image?.url || ''
   }
 
   return (
