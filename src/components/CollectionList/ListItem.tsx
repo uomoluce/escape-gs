@@ -190,19 +190,6 @@ export const ListItem: React.FC<ListItemProps> = ({
         return <span className="text-[var(--secondary-text)] text-opacity-70">{item[field]}</span>
       default:
         const fieldValue = item[field]
-        const hasUrl = !!item.url
-        if (hasUrl && item.url) {
-          return (
-            <Link
-              href={item.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline hover:opacity-75 transition-opacity"
-            >
-              {fieldValue}
-            </Link>
-          )
-        }
         return (
           <span className={isSecondary ? 'text-[var(--secondary-text)] text-opacity-70' : ''}>
             {fieldValue}
