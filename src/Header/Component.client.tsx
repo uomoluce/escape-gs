@@ -21,8 +21,8 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
 
   return (
     <header className="container relative z-20">
-      <div className="pt-8 pb-1 flex border-b border-[var(--border-color)] text-[var(--secondary-text)] dark:text-white">
-        <div className="w-1/2">
+      <div className="pt-8 pb-1 flex flex-col md:flex-row border-b border-[var(--border-color)] text-[var(--secondary-text)] dark:text-white">
+        <div className="w-full md:w-1/2">
           gs <br />
           b.1991, IT <br />
           {data.email && <a href={`mailto:${data.email}`}>EMAIL</a>}
@@ -34,7 +34,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
           )}
         </div>
         {data.description && (
-          <div className="w-1/2 text-[var(--secondary-text)] text-right content-end">
+          <div className="w-full md:w-1/2 text-[var(--secondary-text)] md:text-right mt-4 md:mt-0">
             {data.description}
           </div>
         )}

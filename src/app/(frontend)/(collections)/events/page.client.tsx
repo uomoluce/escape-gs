@@ -1,11 +1,13 @@
 'use client'
 
-import React, { useState, cloneElement } from 'react'
+import React, { useState } from 'react'
 import { X } from 'lucide-react'
 import type { Item } from '@/components/CollectionList/types'
+import { ListItems } from '@/components/CollectionList/ListItems'
 
 interface EventsPageProps {
-  children: React.ReactElement<{ items: Item[] }>
+  items: Item[]
+  columns: any[]
 }
 
 /**
@@ -13,8 +15,12 @@ interface EventsPageProps {
  * Shows a list of events with a filter for event type
  * Separate component as this is a client component and needs to be dynamic
  */
-export function EventsPage({ children }: EventsPageProps) {
+export function EventsPage({ items, columns }: EventsPageProps) {
   const [selectedType, setSelectedType] = useState<string | null>(null)
+
+  const filteredItems = selectedType
+    ? items.filter((item) => item.eventType === selectedType)
+    : items
 
   // Define event types and their labels
   const eventTypeLabels: Record<string, string> = {
@@ -26,13 +32,6 @@ export function EventsPage({ children }: EventsPageProps) {
 
   // Get unique event types and ensure all types are included
   const eventTypes = Object.entries(eventTypeLabels)
-
-  // Filter children based on selected type
-  const filteredChildren = selectedType
-    ? cloneElement(children, {
-        items: children.props.items.filter((item) => item.eventType === selectedType),
-      })
-    : children
 
   return (
     <>
@@ -101,7 +100,9 @@ export function EventsPage({ children }: EventsPageProps) {
           )
         })}
       </div>
-      <div className="py-5">{filteredChildren}</div>
+      <div className="py-5">
+        <ListItems items={filteredItems} columns={columns} collectionType="events" />
+      </div>
     </>
   )
 }

@@ -69,11 +69,7 @@ export default async function Page() {
         : null,
     })) || []
 
-  return (
-    <EventsPage>
-      <CollectionList items={items} columns={columns} collectionType="events" />
-    </EventsPage>
-  )
+  return <EventsPage items={items} columns={columns} />
 }
 
 export function generateMetadata(): Metadata {

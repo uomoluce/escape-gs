@@ -111,7 +111,7 @@ export const ListItem: React.FC<ListItemProps> = ({
             className="inline-flex items-center hover:opacity-75 transition-opacity text-[var(--secondary-text)] text-opacity-70"
             aria-label={isAudioVisible ? 'Hide audio player' : 'Show audio player'}
           >
-            PLAY
+            {isPlaying && isAudioVisible ? 'PAUSE' : 'PLAY'}
           </button>
         ) : null
       case 'watch':
@@ -132,7 +132,7 @@ export const ListItem: React.FC<ListItemProps> = ({
                 href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${hasImage && collectionType === 'events' ? 'hover:underline hover:opacity-75 transition-opacity cursor-pointer' : ''}`}
+                className="hover:underline hover:opacity-75 transition-opacity"
                 onClick={handleTitleClick}
               >
                 {item.title}
@@ -186,10 +186,26 @@ export const ListItem: React.FC<ListItemProps> = ({
             )}
           </div>
         )
+      case 'date':
+        return <span className="text-[var(--secondary-text)] text-opacity-70">{item[field]}</span>
       default:
+        const fieldValue = item[field]
+        const hasUrl = !!item.url
+        if (hasUrl && item.url) {
+          return (
+            <Link
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline hover:opacity-75 transition-opacity"
+            >
+              {fieldValue}
+            </Link>
+          )
+        }
         return (
           <span className={isSecondary ? 'text-[var(--secondary-text)] text-opacity-70' : ''}>
-            {item[field]}
+            {fieldValue}
           </span>
         )
     }
@@ -343,8 +359,8 @@ export const ListItem: React.FC<ListItemProps> = ({
         alt={item.title || 'Event image'}
       />
 
-      {/* Hidden AudioPlayer for duration loadingq */}
-      {hasAudioContent && (
+      {/* Hidden AudioPlayer for duration loading - only for custom audio URLs */}
+      {item.audioUrl && (
         <div
           style={{
             width: '1px',
@@ -355,8 +371,7 @@ export const ListItem: React.FC<ListItemProps> = ({
           }}
         >
           <AudioPlayer
-            audioUrl={item.audioUrl || ''}
-            soundcloudEmbed={item.soundcloudEmbed}
+            audioUrl={item.audioUrl}
             isVisible={false}
             onToggle={() => {}}
             onEnded={() => {}}

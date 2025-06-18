@@ -279,14 +279,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
     if (soundcloudEmbed) {
       return (
         <div className="w-full">
-          <iframe
-            width="100%"
-            height="166"
-            scrolling="no"
-            frameBorder="no"
-            allow="autoplay"
-            src={`https://w.soundcloud.com/player/?url=${encodeURIComponent(soundcloudEmbed)}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true`}
-          />
+          <div className="w-full" dangerouslySetInnerHTML={{ __html: soundcloudEmbed }} />
         </div>
       )
     }
