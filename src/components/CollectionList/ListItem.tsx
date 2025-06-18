@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ImageIcon, PauseIcon, PlayIcon, X } from 'lucide-react'
 import type { ListItemProps } from './types'
 import { EmbedWrapper } from '@/components/EmbedWrapper'
 import { ImageModal } from '@/components/ImageModal'
+import { AudioPlayer } from '@/components/AudioPlayer'
 
 export const ListItem: React.FC<ListItemProps> = ({
   item,
@@ -18,13 +19,10 @@ export const ListItem: React.FC<ListItemProps> = ({
   onVideoToggle,
   isFirstOfYear,
 }) => {
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
   const [showImage, setShowImage] = useState(false)
-  const [isDragging, setIsDragging] = useState(false)
-  const audioRef = useRef<HTMLAudioElement>(null)
-  const progressBarRef = useRef<HTMLDivElement>(null)
+  const [duration, setDuration] = useState(0)
+  const [currentTime, setCurrentTime] = useState<number>(0)
+  const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const gridTemplateColumns = columns.map((col) => col.width || '1fr').join(' ')
 
   const hasAudioContent = Boolean(item.audioUrl) || Boolean(item.soundcloudEmbed)
@@ -32,7 +30,7 @@ export const ListItem: React.FC<ListItemProps> = ({
   const hasExternalUrl = Boolean(item.url)
   const hasImage = Boolean(item.image?.url)
 
-  // Add a hidden audio element to preload metadata
+  // Add a hidden audio element to preload metadata (original approach that was working)
   useEffect(() => {
     if (item.audioUrl) {
       const audio = new Audio(item.audioUrl)
@@ -43,73 +41,10 @@ export const ListItem: React.FC<ListItemProps> = ({
     }
   }, [item.audioUrl])
 
-  // Add a reset function to ensure consistent state when switching tracks
-  const resetPlayerState = (newTime = 0) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = newTime
-      setCurrentTime(newTime)
-    }
-  }
-
+  // Debug duration changes
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.addEventListener('timeupdate', updateTime)
-
-      // Add a seeking event to update the UI immediately during seeking
-      audioRef.current.addEventListener('seeking', () => {
-        if (audioRef.current) {
-          setCurrentTime(audioRef.current.currentTime)
-        }
-      })
-
-      audioRef.current.addEventListener('loadedmetadata', () => {
-        setDuration(audioRef.current?.duration || 0)
-
-        // Reset UI immediately after metadata is loaded
-        if (audioRef.current) {
-          setCurrentTime(audioRef.current.currentTime)
-        }
-
-        if (isAudioVisible) {
-          const playPromise = audioRef.current?.play()
-          if (playPromise !== undefined) {
-            playPromise
-              .then(() => {
-                setIsPlaying(true)
-              })
-              .catch((error) => {
-                console.error('Playback failed:', error)
-                setIsPlaying(false)
-              })
-          }
-        }
-      })
-    }
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.removeEventListener('timeupdate', updateTime)
-        audioRef.current.removeEventListener('seeking', updateTime)
-      }
-    }
-  }, [isAudioVisible, item.audioUrl]) // Add item.audioUrl as dependency to refresh when track changes
-
-  useEffect(() => {
-    // Immediately reset position display when audio becomes invisible
-    if (!isAudioVisible) {
-      resetPlayerState()
-    }
-  }, [isAudioVisible])
-
-  const updateTime = () => {
-    if (audioRef.current) {
-      // Force UI update with the current audio position
-      requestAnimationFrame(() => {
-        if (audioRef.current) {
-          setCurrentTime(audioRef.current.currentTime)
-        }
-      })
-    }
-  }
+    // Duration changed
+  }, [duration, item.title])
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60)
@@ -117,77 +52,11 @@ export const ListItem: React.FC<ListItemProps> = ({
     return `${minutes}:${seconds.toString().padStart(2, '0')}`
   }
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current || !duration) return
-
-    const progressBar = e.currentTarget
-    const rect = progressBar.getBoundingClientRect()
-    const position = (e.clientX - rect.left) / rect.width
-    const seekTime = position * duration
-
-    audioRef.current.currentTime = seekTime
-    setCurrentTime(seekTime)
-  }
-
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current || !duration) return
-
-    setIsDragging(true)
-
-    // Pause audio during drag for better performance
-    if (isPlaying && audioRef.current) {
-      audioRef.current.pause()
-    }
-
-    // Update position immediately on mouse down
-    handleSeek(e)
-  }
-
-  const handlePlayClick = () => {
-    if (!hasAudioContent) return
-
-    if (isAudioVisible) {
-      if (item.audioUrl && isPlaying) {
-        audioRef.current?.pause()
-        setIsPlaying(false)
-      }
-      onAudioToggle()
-    } else {
-      onAudioToggle()
-    }
-  }
-
   const handleTitleClick = (e: React.MouseEvent) => {
     if (collectionType === 'events' && hasImage) {
       e.preventDefault()
       setShowImage(!showImage)
     }
-  }
-
-  const renderPlayButton = () => {
-    if (!hasAudioContent) return null
-
-    return (
-      <button
-        onClick={handlePlayClick}
-        className="inline-flex items-center hover:opacity-75 transition-opacity"
-      >
-        {isPlaying && isAudioVisible ? 'PAUSE' : 'PLAY'}
-      </button>
-    )
-  }
-
-  const renderWatchButton = () => {
-    if (!hasVideoContent) return null
-
-    return (
-      <button
-        onClick={onVideoToggle}
-        className="inline-flex items-center hover:opacity-75 transition-opacity"
-      >
-        {isVideoVisible ? 'HIDE' : 'WATCH'}
-      </button>
-    )
   }
 
   const renderTitle = () => {
@@ -209,23 +78,6 @@ export const ListItem: React.FC<ListItemProps> = ({
     }
 
     return titleContent
-  }
-
-  const renderDuration = () => {
-    if (!item.audioUrl) return item.duration || null
-
-    if (duration > 0) {
-      if (isAudioVisible && isPlaying) {
-        return (
-          <div className="text-right tabular-nums">
-            {formatTime(currentTime)} / {formatTime(duration)}
-          </div>
-        )
-      }
-      return <div className="tabular-nums text-right">{formatTime(duration)}</div>
-    }
-
-    return <div className="tabular-nums text-right">--:--</div>
   }
 
   const renderCell = (field: string) => {
@@ -255,24 +107,11 @@ export const ListItem: React.FC<ListItemProps> = ({
       case 'play':
         return hasAudioContent ? (
           <button
-            onClick={() => {
-              if (isAudioVisible) {
-                if (isPlaying) {
-                  audioRef.current?.pause()
-                  setIsPlaying(false)
-                } else if (audioRef.current) {
-                  audioRef.current.play()
-                  setIsPlaying(true)
-                }
-              }
-              onAudioToggle()
-            }}
+            onClick={onAudioToggle}
             className="inline-flex items-center hover:opacity-75 transition-opacity text-[var(--secondary-text)] text-opacity-70"
-            aria-label={
-              isAudioVisible ? (isPlaying ? 'Pause audio' : 'Play audio') : 'Show audio player'
-            }
+            aria-label={isAudioVisible ? 'Hide audio player' : 'Show audio player'}
           >
-            {isAudioVisible ? (isPlaying ? 'PAUSE' : 'PLAY') : 'PLAY'}
+            PLAY
           </button>
         ) : null
       case 'watch':
@@ -336,25 +175,15 @@ export const ListItem: React.FC<ListItemProps> = ({
         )
       case 'duration':
         if (!hasAudioContent) return null
-        if (item.audioUrl) {
-          if (duration > 0) {
-            if (isAudioVisible && isPlaying) {
-              return (
-                <div className="text-right tabular-nums text-[var(--secondary-text)] text-opacity-70">
-                  {formatTime(currentTime)} / {formatTime(duration)}
-                </div>
-              )
-            }
-            return (
-              <div className="tabular-nums text-right text-[var(--secondary-text)] text-opacity-70">
-                {formatTime(duration)}
-              </div>
-            )
-          }
-        }
         return (
           <div className="tabular-nums text-right text-[var(--secondary-text)] text-opacity-70">
-            --:--
+            {isPlaying && isAudioVisible ? (
+              <span>
+                {formatTime(currentTime)} / {formatTime(duration)}
+              </span>
+            ) : (
+              <span>{duration > 0 ? formatTime(duration) : '--:--'}</span>
+            )}
           </div>
         )
       default:
@@ -375,66 +204,22 @@ export const ListItem: React.FC<ListItemProps> = ({
       )
     }
 
-    if (isAudioVisible) {
-      // Then prefer our own audio URL if available
-      if (item.audioUrl) {
-        return (
-          <div className="w-full md:w-[calc(100%-60px)] md:ml-[60px] mb-4">
-            <div className="flex items-center">
-              <div
-                ref={progressBarRef}
-                className="flex-grow h-[2px] bg-border cursor-pointer relative group"
-                onClick={handleSeek}
-                onMouseDown={handleMouseDown}
-                aria-label="Audio progress"
-                aria-valuemin={0}
-                aria-valuemax={duration || 100}
-                aria-valuenow={currentTime}
-                aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
-              >
-                {/* Progress fill */}
-                <div
-                  className="absolute top-0 left-0 bottom-0 bg-foreground group-hover:bg-primary transition-colors"
-                  style={{
-                    width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
-                    transition: isDragging ? 'none' : 'width 0.1s linear',
-                  }}
-                />
-              </div>
-            </div>
-
-            <audio
-              ref={audioRef}
-              className="hidden"
-              preload="metadata"
-              key={item.audioUrl}
-              onLoadedMetadata={(e) => {
-                const audio = e.target as HTMLAudioElement
-                setDuration(audio.duration)
-              }}
-              onEnded={() => {
-                setIsPlaying(false)
-                resetPlayerState(0)
-                onAudioToggle()
-              }}
-              onError={(e) => {
-                console.error('Audio playback error:', e)
-                setIsPlaying(false)
-              }}
-              src={item.audioUrl}
-            />
-          </div>
-        )
-      }
-
-      // Finally fall back to Soundcloud embed if available
-      if (item.soundcloudEmbed) {
-        return (
-          <div className="w-full md:w-[calc(100%-60px)] md:ml-[60px] my-4">
-            <EmbedWrapper html={item.soundcloudEmbed} isDesktopOnly={true} />
-          </div>
-        )
-      }
+    if (isAudioVisible && hasAudioContent) {
+      return (
+        <div className="w-full md:w-[calc(100%-60px)] md:ml-[60px] mb-4">
+          <AudioPlayer
+            audioUrl={item.audioUrl || ''}
+            soundcloudEmbed={item.soundcloudEmbed}
+            isVisible={isAudioVisible}
+            onToggle={onAudioToggle}
+            onEnded={onAudioToggle}
+            onDurationChange={setDuration}
+            onTimeUpdate={setCurrentTime}
+            onPlayingStateChange={setIsPlaying}
+            showControls={false}
+          />
+        </div>
+      )
     }
 
     return null
@@ -488,23 +273,17 @@ export const ListItem: React.FC<ListItemProps> = ({
           <div className="flex items-center gap-4">
             {hasAudioContent && (
               <button
-                onClick={handlePlayClick}
+                onClick={onAudioToggle}
                 className="flex items-center gap-1 hover:opacity-75 transition-opacity"
-                aria-label={
-                  isAudioVisible ? (isPlaying ? 'Pause audio' : 'Play audio') : 'Show audio player'
-                }
+                aria-label={isAudioVisible ? 'Hide audio player' : 'Show audio player'}
               >
                 {isAudioVisible ? (
-                  isPlaying ? (
-                    <PauseIcon className="w-4 h-4 text-[var(--secondary-text)]" />
-                  ) : (
-                    <PlayIcon className="w-4 h-4 text-[var(--secondary-text)]" />
-                  )
+                  <PauseIcon className="w-4 h-4 text-[var(--secondary-text)]" />
                 ) : (
                   <PlayIcon className="w-4 h-4 text-[var(--secondary-text)]" />
                 )}
                 <span className="text-[var(--secondary-text)] text-opacity-70">
-                  {isAudioVisible ? (isPlaying ? 'PAUSE' : 'PLAY') : 'PLAY'}
+                  {isAudioVisible ? 'HIDE' : 'PLAY'}
                 </span>
               </button>
             )}
@@ -563,6 +342,31 @@ export const ListItem: React.FC<ListItemProps> = ({
         imageUrl={getImageUrl(item.image)}
         alt={item.title || 'Event image'}
       />
+
+      {/* Hidden AudioPlayer for duration loadingq */}
+      {hasAudioContent && (
+        <div
+          style={{
+            width: '1px',
+            height: '1px',
+            overflow: 'hidden',
+            position: 'absolute',
+            top: '-9999px',
+          }}
+        >
+          <AudioPlayer
+            audioUrl={item.audioUrl || ''}
+            soundcloudEmbed={item.soundcloudEmbed}
+            isVisible={false}
+            onToggle={() => {}}
+            onEnded={() => {}}
+            onDurationChange={setDuration}
+            onTimeUpdate={setCurrentTime}
+            onPlayingStateChange={setIsPlaying}
+            showControls={false}
+          />
+        </div>
+      )}
     </div>
   )
 }
