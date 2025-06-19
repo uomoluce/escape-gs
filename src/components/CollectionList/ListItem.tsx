@@ -30,6 +30,20 @@ export const ListItem: React.FC<ListItemProps> = ({
   const hasExternalUrl = Boolean(item.url)
   const hasImage = Boolean(item.image?.url)
 
+  // Load duration immediately on mount for immediate display
+  useEffect(() => {
+    if (item.audioUrl && duration === 0) {
+      const audio = new Audio()
+      audio.preload = 'metadata'
+      audio.addEventListener('loadedmetadata', () => {
+        setDuration(audio.duration)
+        // Clean up the temporary audio element
+        audio.remove()
+      })
+      audio.src = item.audioUrl
+    }
+  }, [item.audioUrl, duration])
+
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60)
     const seconds = Math.floor(time % 60)
