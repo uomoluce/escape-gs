@@ -30,22 +30,6 @@ export const ListItem: React.FC<ListItemProps> = ({
   const hasExternalUrl = Boolean(item.url)
   const hasImage = Boolean(item.image?.url)
 
-  // Add a hidden audio element to preload metadata (original approach that was working)
-  useEffect(() => {
-    if (item.audioUrl) {
-      const audio = new Audio(item.audioUrl)
-      audio.preload = 'metadata'
-      audio.addEventListener('loadedmetadata', () => {
-        setDuration(audio.duration)
-      })
-    }
-  }, [item.audioUrl])
-
-  // Debug duration changes
-  useEffect(() => {
-    // Duration changed
-  }, [duration, item.title])
-
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60)
     const seconds = Math.floor(time % 60)
@@ -315,8 +299,6 @@ export const ListItem: React.FC<ListItemProps> = ({
             {renderCell('duration')}
           </div>
         )}
-        {/* Render media player in mobile view */}
-        {(hasAudioContent || hasVideoContent) && renderMediaPlayer()}
       </div>
       <div className="md:hidden border-b border-[var(--border-color)] border-opacity-20 hover:bg-[rgba(152,161,166,0.05)]" />
 
@@ -334,10 +316,9 @@ export const ListItem: React.FC<ListItemProps> = ({
           </div>
         ))}
       </div>
-      {/* Render media player in desktop view */}
-      <div className="hidden md:block">
-        {(hasAudioContent || hasVideoContent) && renderMediaPlayer()}
-      </div>
+
+      {/* Media player - rendered once for both mobile and desktop */}
+      {(hasAudioContent || hasVideoContent) && renderMediaPlayer()}
 
       <ImageModal
         isOpen={showImage}
@@ -345,30 +326,6 @@ export const ListItem: React.FC<ListItemProps> = ({
         imageUrl={getImageUrl(item.image)}
         alt={item.title || 'Event image'}
       />
-
-      {/* Hidden AudioPlayer for duration loading - only for custom audio URLs */}
-      {item.audioUrl && (
-        <div
-          style={{
-            width: '1px',
-            height: '1px',
-            overflow: 'hidden',
-            position: 'absolute',
-            top: '-9999px',
-          }}
-        >
-          <AudioPlayer
-            audioUrl={item.audioUrl}
-            isVisible={false}
-            onToggle={() => {}}
-            onEnded={() => {}}
-            onDurationChange={setDuration}
-            onTimeUpdate={setCurrentTime}
-            onPlayingStateChange={setIsPlaying}
-            showControls={false}
-          />
-        </div>
-      )}
     </div>
   )
 }

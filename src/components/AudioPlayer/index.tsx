@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { PauseIcon, PlayIcon } from 'lucide-react'
 
 interface AudioPlayerProps {
@@ -37,120 +37,65 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
   const hasAudioContent = Boolean(audioUrl) || Boolean(soundcloudEmbed)
 
-  // Debug component mounting
-  useEffect(() => {
-    // Component mounted/updated
-  }, [audioUrl, isVisible])
-
-  // Add a reset function to ensure consistent state when switching tracks
-  const resetPlayerState = (newTime = 0) => {
+  // Stable event handlers using useCallback to prevent recreation
+  const handleTimeUpdate = useCallback(() => {
     if (audioRef.current) {
-      audioRef.current.currentTime = newTime
-      setCurrentTime(newTime)
+      setCurrentTime(audioRef.current.currentTime)
+      onTimeUpdate?.(audioRef.current.currentTime)
     }
-  }
+  }, [onTimeUpdate])
 
-  useEffect(() => {
+  const handleLoadedMetadata = useCallback(() => {
     if (audioRef.current) {
-      audioRef.current.addEventListener('timeupdate', updateTime)
-
-      // Add a seeking event to update the UI immediately during seeking
-      audioRef.current.addEventListener('seeking', () => {
-        if (audioRef.current) {
-          setCurrentTime(audioRef.current.currentTime)
-        }
-      })
-
-      audioRef.current.addEventListener('loadedmetadata', () => {
-        setDuration(audioRef.current?.duration || 0)
-        onDurationChange?.(audioRef.current?.duration || 0)
-
-        // Reset UI immediately after metadata is loaded
-        if (audioRef.current) {
-          setCurrentTime(audioRef.current.currentTime)
-        }
-
-        if (isVisible) {
-          const playPromise = audioRef.current?.play()
-          if (playPromise !== undefined) {
-            playPromise
-              .then(() => {
-                setIsPlaying(true)
-                onPlayingStateChange?.(true)
-              })
-              .catch((error) => {
-                console.error('Playback failed:', error)
-                setIsPlaying(false)
-                onPlayingStateChange?.(false)
-              })
-          }
-        }
-      })
+      setDuration(audioRef.current.duration)
+      onDurationChange?.(audioRef.current.duration)
     }
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.removeEventListener('timeupdate', updateTime)
-        audioRef.current.removeEventListener('seeking', updateTime)
-      }
-    }
-  }, [isVisible, audioUrl])
+  }, [onDurationChange])
 
-  // Add global mouse up listener for dragging
+  const handlePlay = useCallback(() => {
+    setIsPlaying(true)
+    onPlayingStateChange?.(true)
+  }, [onPlayingStateChange])
+
+  const handlePause = useCallback(() => {
+    setIsPlaying(false)
+    onPlayingStateChange?.(false)
+  }, [onPlayingStateChange])
+
+  const handleEnded = useCallback(() => {
+    setIsPlaying(false)
+    onPlayingStateChange?.(false)
+    onEnded?.()
+  }, [onPlayingStateChange, onEnded])
+
+  // Set up event listeners once with stable references
   useEffect(() => {
-    const handleGlobalMouseMove = (e: MouseEvent) => {
-      if (isDragging && progressBarRef.current) {
-        // Convert global mouse position to local progress bar position
-        const rect = progressBarRef.current.getBoundingClientRect()
-        const position = (e.clientX - rect.left) / rect.width
-        const seekTime = Math.max(0, Math.min(position * duration, duration))
+    const audio = audioRef.current
+    if (!audio) return
 
-        if (audioRef.current) {
-          audioRef.current.currentTime = seekTime
-          setCurrentTime(seekTime)
-        }
-      }
-    }
-
-    const handleGlobalMouseUp = () => {
-      if (isDragging && audioRef.current) {
-        // Update isPlaying state to match the actual audio state
-        const newPlayingState = !audioRef.current.paused
-        setIsPlaying(newPlayingState)
-        onPlayingStateChange?.(newPlayingState)
-        setIsDragging(false)
-      }
-    }
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleGlobalMouseMove)
-      document.addEventListener('mouseup', handleGlobalMouseUp)
-    }
+    audio.addEventListener('timeupdate', handleTimeUpdate)
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata)
+    audio.addEventListener('play', handlePlay)
+    audio.addEventListener('pause', handlePause)
+    audio.addEventListener('ended', handleEnded)
 
     return () => {
-      document.removeEventListener('mousemove', handleGlobalMouseMove)
-      document.removeEventListener('mouseup', handleGlobalMouseUp)
+      audio.removeEventListener('timeupdate', handleTimeUpdate)
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata)
+      audio.removeEventListener('play', handlePlay)
+      audio.removeEventListener('pause', handlePause)
+      audio.removeEventListener('ended', handleEnded)
     }
-  }, [isDragging, duration])
+  }, [handleTimeUpdate, handleLoadedMetadata, handlePlay, handlePause, handleEnded])
 
+  // Auto-play when audio becomes visible
   useEffect(() => {
-    // Immediately reset position display when audio becomes invisible
-    if (!isVisible) {
-      resetPlayerState()
-    }
-  }, [isVisible])
-
-  const updateTime = () => {
-    if (audioRef.current) {
-      // Force UI update with the current audio position
-      requestAnimationFrame(() => {
-        if (audioRef.current) {
-          const currentTime = audioRef.current.currentTime
-          setCurrentTime(currentTime)
-          onTimeUpdate?.(currentTime)
-        }
+    if (isVisible && audioUrl && audioRef.current && !isPlaying) {
+      audioRef.current.play().catch(() => {
+        // Ignore autoplay errors
       })
     }
-  }
+  }, [isVisible, audioUrl, isPlaying])
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60)
@@ -158,41 +103,77 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
     return `${minutes}:${seconds.toString().padStart(2, '0')}`
   }
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current || !duration) return
+  // Click-to-seek functionality
+  const handleSeek = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!audioRef.current || !duration) return
 
-    const progressBar = e.currentTarget
-    const rect = progressBar.getBoundingClientRect()
-    const position = (e.clientX - rect.left) / rect.width
-    const seekTime = position * duration
+      const rect = e.currentTarget.getBoundingClientRect()
+      const position = (e.clientX - rect.left) / rect.width
+      const seekTime = Math.max(0, Math.min(position * duration, duration))
 
-    audioRef.current.currentTime = seekTime
-    setCurrentTime(seekTime)
-  }
+      audioRef.current.currentTime = seekTime
+    },
+    [duration],
+  )
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current || !duration) return
+  // Drag-to-seek functionality
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!audioRef.current || !duration) return
+      setIsDragging(true)
+      handleSeek(e)
+    },
+    [duration, handleSeek],
+  )
 
-    setIsDragging(true)
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isDragging || !audioRef.current || !duration || !progressBarRef.current) return
 
-    // Update position immediately on mouse down
-    handleSeek(e)
-  }
+      const rect = progressBarRef.current.getBoundingClientRect()
+      const position = (e.clientX - rect.left) / rect.width
+      const seekTime = Math.max(0, Math.min(position * duration, duration))
 
-  const handlePlayClick = () => {
-    if (!hasAudioContent) return
+      audioRef.current.currentTime = seekTime
+    },
+    [isDragging, duration],
+  )
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  // Global mouse listeners for dragging outside the progress bar
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp])
+
+  const handlePlayClick = useCallback(() => {
+    if (!hasAudioContent || !audioRef.current) return
 
     if (isVisible) {
-      if (audioUrl && isPlaying) {
-        audioRef.current?.pause()
-        setIsPlaying(false)
-        onPlayingStateChange?.(false)
+      if (audioUrl) {
+        if (isPlaying) {
+          audioRef.current.pause()
+        } else {
+          audioRef.current.play().catch(() => {
+            // Ignore play errors
+          })
+        }
       }
-      onToggle()
     } else {
       onToggle()
     }
-  }
+  }, [hasAudioContent, isVisible, audioUrl, isPlaying, onToggle])
 
   const renderPlayButton = () => {
     if (!hasAudioContent || !showControls) return null
@@ -299,35 +280,12 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
       )}
       {renderAudioPlayer()}
 
-      {/* Hidden audio element - always render to load duration */}
+      {/* Hidden audio element - always render to ensure stable reference and load metadata */}
       {audioUrl && (
         <audio
           ref={audioRef}
           style={{ position: 'absolute', top: '-9999px', width: '1px', height: '1px' }}
           preload="metadata"
-          key={audioUrl}
-          onLoadStart={() => {
-            // Audio load started
-          }}
-          onLoadedMetadata={(e) => {
-            const audio = e.target as HTMLAudioElement
-            setDuration(audio.duration)
-            onDurationChange?.(audio.duration)
-          }}
-          onCanPlay={() => {
-            // Audio can play
-          }}
-          onEnded={() => {
-            setIsPlaying(false)
-            onPlayingStateChange?.(false)
-            resetPlayerState(0)
-            onEnded?.()
-          }}
-          onError={(e) => {
-            console.error('AudioPlayer: Audio playback error:', e)
-            setIsPlaying(false)
-            onPlayingStateChange?.(false)
-          }}
           src={audioUrl}
         />
       )}
