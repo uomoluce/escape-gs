@@ -30,15 +30,6 @@ This is a monorepo setup where Payload CMS and the Next.js frontend share the sa
 - Search indexes `posts` only
 - Redirects managed via plugin (UI hidden), used for safe URL changes
 
-## Revalidation
-
-- On change, the frontend is revalidated:
-  - `posts`: `afterChange`/`afterDelete`
-  - `pages`: `afterChange`/`afterDelete`
-  - `header` global
-  - redirects
-- Note: when an image is edited (e.g., crops), republish the using page to refresh the Next Image cache.
-
 ## Tech stack
 
 - Next.js App Router, React, TypeScript
